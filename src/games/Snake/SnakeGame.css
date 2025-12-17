@@ -1,0 +1,534 @@
+/* SnakeGame.css - Исправленный дизайн с центрированием */
+
+.snake-game {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  color: #333;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e1e5e9;
+  flex-shrink: 0;
+}
+
+.game-header h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+  font-weight: 600;
+}
+
+.game-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.control-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.start-btn {
+  background: linear-gradient(45deg, #00b09b, #96c93d);
+  color: white;
+}
+
+.pause-btn {
+  background: linear-gradient(45deg, #ff9966, #ff5e62);
+  color: white;
+}
+
+.game-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e1e5e9;
+  flex-shrink: 0;
+}
+
+.stat-box {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #e1e5e9;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: #666;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #667eea;
+}
+
+/* ИСПРАВЛЕННЫЙ КОНТЕЙНЕР - теперь всё по центру */
+.game-board-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.start-screen {
+  width: 100%;
+  max-width: 320px;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+
+.instructions h3 {
+  color: #667eea;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.instructions ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.instructions li {
+  padding: 6px 0;
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.start-instruction-btn {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.start-instruction-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.paused-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.paused-screen h3 {
+  font-size: 18px;
+  color: #667eea;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.paused-screen p {
+  color: #666;
+  font-size: 12px;
+}
+
+/* ИСПРАВЛЕННОЕ ИГРОВОЕ ПОЛЕ - теперь точно по центру */
+.game-board {
+  display: block;
+  border: 2px solid #e1e5e9;
+  border-radius: 6px;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  position: relative;
+  margin: 0 auto; /* Центрирование */
+}
+
+.grid-row {
+  display: flex;
+}
+
+.grid-cell {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #f0f0f0;
+  position: relative;
+}
+
+.grid-cell.snake-head {
+  background: linear-gradient(45deg, #00b09b, #96c93d);
+  border-radius: 50%;
+}
+
+.grid-cell.snake-body {
+  background: linear-gradient(45deg, #4cc9f0, #4361ee);
+  border-radius: 3px;
+}
+
+.grid-cell.food {
+  background: linear-gradient(45deg, #ff5e62, #ff9966);
+  border-radius: 50%;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.9; }
+}
+
+.game-over-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.98);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.game-over-content {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  border: 2px solid #e1e5e9;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  max-width: 280px;
+  width: 90%;
+}
+
+.game-over-content h3 {
+  font-size: 16px;
+  color: #ff5e62;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.final-stats {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 12px 0;
+  border: 1px solid #e1e5e9;
+}
+
+.final-stats p {
+  margin: 6px 0;
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  justify-content: space-between;
+}
+
+.final-stats strong {
+  color: #667eea;
+  font-size: 14px;
+}
+
+.play-again-btn {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 auto;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.play-again-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.mobile-controls {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  gap: 4px;
+  flex-shrink: 0;
+  border-top: 1px solid #e1e5e9;
+}
+
+.horizontal-controls {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.mobile-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: #667eea;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-btn:active {
+  transform: scale(0.95);
+  background: #764ba2;
+}
+
+.center-space {
+  width: 40px;
+}
+
+.game-instructions {
+  padding: 12px 16px;
+  border-top: 1px solid #e1e5e9;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: #666;
+}
+
+.game-instructions p {
+  margin: 2px 0;
+}
+
+.game-instructions strong {
+  color: #333;
+}
+
+.legend {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.legend-color.snake-head {
+  background: linear-gradient(45deg, #00b09b, #96c93d);
+}
+
+.legend-color.snake-body {
+  background: linear-gradient(45deg, #4cc9f0, #4361ee);
+}
+
+.legend-color.food {
+  background: linear-gradient(45deg, #ff5e62, #ff9966);
+}
+
+@media (max-width: 768px) {
+  .game-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .mobile-controls {
+    display: flex;
+  }
+  
+  .game-instructions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .legend {
+    justify-content: center;
+  }
+  
+  .grid-cell {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-cell {
+    width: 16px;
+    height: 16px;
+  }
+}
+/* Стили для выбора сложности */
+.difficulty-selector {
+  padding: 8px 16px;
+  border-bottom: 1px solid #e1e5e9;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  background: #f8f9fa;
+}
+
+.difficulty-label {
+  font-size: 11px;
+  color: #666;
+  font-weight: 600;
+}
+
+.difficulty-btn {
+  padding: 6px 12px;
+  background: #f8f9fa;
+  border: 1px solid #e1e5e9;
+  border-radius: 6px;
+  font-size: 10px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.difficulty-btn.active {
+  color: white;
+  border-color: transparent;
+}
+
+.difficulty-btn:hover:not(.active) {
+  background: #e1e5e9;
+}
+
+.difficulty-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid #e1e5e9;
+  background: white;
+  flex-shrink: 0;
+}
+
+.info-item {
+  text-align: center;
+  font-size: 11px;
+}
+
+.info-item span {
+  display: block;
+  color: #666;
+  margin-bottom: 2px;
+}
+
+.info-item strong {
+  color: #667eea;
+  font-weight: 600;
+}
+
+/* Исправленное игровое поле с CSS Grid */
+.game-board {
+  display: grid;
+  border: 2px solid #e1e5e9;
+  border-radius: 6px;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  position: relative;
+  margin: 0 auto;
+  max-width: 400px;
+  max-height: 400px;
+}
+
+.grid-cell {
+  border: 1px solid #f0f0f0;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .difficulty-selector {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .difficulty-info {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .game-board {
+    max-width: 350px;
+    max-height: 350px;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-board {
+    max-width: 300px;
+    max-height: 300px;
+  }
+  
+  .difficulty-btn {
+    padding: 4px 8px;
+    font-size: 9px;
+  }
+  
+  .info-item {
+    font-size: 10px;
+  }
+}

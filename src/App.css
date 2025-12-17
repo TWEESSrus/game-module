@@ -1,38 +1,338 @@
-.App {
-  text-align: center;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+#root {
+  width: 100%;
+  height: 100%;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.app {
+  width: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+.header {
+  background: white;
+  padding: 12px 20px;
+  color: #333;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 24px;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+}
+
+.header p {
+  margin: 4px 0 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  padding: 15px;
+  gap: 15px;
+  height: calc(100vh - 70px);
+}
+
+.flow-container {
+  flex: 1;
+  min-width: 300px;
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e1e5e9;
+  position: relative;
+  overflow: hidden;
+}
+
+.game-container {
+  flex: 1;
+  min-width: 300px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e1e5e9;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Реакт Флоу стили */
+.react-flow {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.react-flow__viewport {
+  transform: none !important;
+}
+
+.react-flow__renderer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.react-flow__controls {
+  background: white !important;
+  border: 1px solid #e1e5e9 !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 8px !important;
+}
+
+.react-flow__controls-button {
+  background: white !important;
+  border-bottom: 1px solid #e1e5e9 !important;
+  color: #667eea !important;
+}
+
+.react-flow__controls-button:hover {
+  background: #f8f9fa !important;
+}
+
+.react-flow__controls-button svg {
+  fill: #667eea !important;
+}
+
+.react-flow__minimap {
+  background: white !important;
+  border: 1px solid #e1e5e9 !important;
+  border-radius: 8px !important;
+}
+
+.react-flow__background {
+  color: rgba(102, 126, 234, 0.1) !important;
+}
+
+.react-flow-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+}
+
+.control-btn {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 5px rgba(102, 126, 234, 0.3);
+}
+
+.control-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+}
+
+/* Стили для GameNode */
+.game-node {
+  position: relative;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  min-width: 140px;
+  max-width: 180px;
+  border: 2px solid transparent;
+  background: white;
+}
+
+.game-node:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: #e1e5e9;
+}
+
+.game-node.selected {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+  z-index: 10;
+}
+
+.game-node.playing {
+  animation: pulse 0.5s ease;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+.node-content {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.node-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.game-icon {
+  font-size: 22px;
+  width: 30px;
+  height: 30px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+}
+
+.node-info {
+  flex: 1;
+}
+
+.node-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.playing-indicator {
+  font-size: 10px;
+  color: #667eea;
+  font-weight: 500;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.node-score {
+  text-align: center;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e1e5e9;
+}
+
+.score-label {
+  font-size: 10px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.score-value {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.play-button {
+  background: linear-gradient(45deg, #667eea, #764ba2);
   color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.App-link {
-  color: #61dafb;
+.play-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.button-text {
+  flex: 1;
+  text-align: left;
+}
+
+.button-icon {
+  font-size: 10px;
+}
+
+/* Стили для соединений */
+.react-flow__edge-path {
+  stroke-width: 2 !important;
+  stroke: #667eea !important;
+}
+
+.react-flow__edge.animated path {
+  stroke-dasharray: 5;
+  animation: dashdraw 0.5s linear infinite;
+}
+
+@keyframes dashdraw {
+  from { stroke-dashoffset: 10; }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+    padding: 10px;
   }
-  to {
-    transform: rotate(360deg);
+  
+  .flow-container,
+  .game-container {
+    flex: none;
+    height: 45vh;
+    min-width: 0;
+  }
+  
+  .header h1 {
+    font-size: 20px;
   }
 }

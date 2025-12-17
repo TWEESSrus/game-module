@@ -1,0 +1,361 @@
+/* Game2048.css - Компактный дизайн */
+
+.game-2048 {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  color: #333;
+  overflow: hidden;
+}
+
+.game-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e1e5e9;
+}
+
+.game-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #333;
+  font-weight: 600;
+}
+
+.game-subtitle {
+  font-size: 11px;
+  color: #666;
+}
+
+.score-display {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #e1e5e9;
+  margin-bottom: 12px;
+}
+
+.score-label {
+  font-size: 10px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.score-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #667eea;
+}
+
+.game-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.control-btn {
+  flex: 1;
+  padding: 8px;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.control-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.instructions {
+  padding: 8px 16px;
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+  border-bottom: 1px solid #e1e5e9;
+}
+
+.instructions p {
+  margin: 4px 0;
+}
+
+.instructions strong {
+  color: #333;
+  font-weight: 600;
+}
+
+.game-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  gap: 16px;
+  min-height: 0;
+}
+
+.board-container {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.board {
+  background: #bbada0;
+  border-radius: 6px;
+  padding: 8px;
+  display: inline-block;
+}
+
+.row {
+  display: flex;
+  margin-bottom: 8px;
+}
+
+.row:last-child {
+  margin-bottom: 0;
+}
+
+.cell {
+  width: 50px;
+  height: 50px;
+  background: rgba(238, 228, 218, 0.35);
+  border-radius: 3px;
+  margin-right: 8px;
+  position: relative;
+}
+
+.cell:last-child {
+  margin-right: 0;
+}
+
+.tile {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  font-weight: bold;
+  z-index: 1;
+  font-size: 18px;
+}
+
+.tile-2 { background: #eee4da; color: #776e65; }
+.tile-4 { background: #ede0c8; color: #776e65; }
+.tile-8 { background: #f2b179; color: #f9f6f2; }
+.tile-16 { background: #f59563; color: #f9f6f2; }
+.tile-32 { background: #f67c5f; color: #f9f6f2; }
+.tile-64 { background: #f65e3b; color: #f9f6f2; }
+.tile-128 { background: #edcf72; color: #f9f6f2; font-size: 16px; }
+.tile-256 { background: #edcc61; color: #f9f6f2; font-size: 16px; }
+.tile-512 { background: #edc850; color: #f9f6f2; font-size: 16px; }
+.tile-1024 { background: #edc53f; color: #f9f6f2; font-size: 14px; }
+.tile-2048 { background: #edc22e; color: #f9f6f2; font-size: 14px; animation: glow 2s infinite; }
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(237, 194, 46, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(237, 194, 46, 0.8); }
+}
+
+.mobile-controls {
+  display: none;
+  width: 100%;
+  max-width: 200px;
+}
+
+.control-row {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 4px 0;
+}
+
+.mobile-control-btn {
+  width: 50px;
+  height: 50px;
+  background: #667eea;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.mobile-control-btn:active {
+  transform: scale(0.95);
+  background: #764ba2;
+}
+
+.spacer {
+  width: 50px;
+}
+
+.game-over-overlay,
+.win-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.game-over-content,
+.win-content {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  border: 2px solid #e1e5e9;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  max-width: 280px;
+  width: 90%;
+}
+
+.game-over-content h3 {
+  color: #ff5e62;
+  font-size: 16px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.win-content h3 {
+  color: #00b09b;
+  font-size: 16px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.final-score {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 12px 0;
+  border: 1px solid #e1e5e9;
+}
+
+.final-score p {
+  margin: 6px 0;
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  justify-content: space-between;
+}
+
+.final-score strong {
+  color: #667eea;
+  font-size: 14px;
+}
+
+.play-again-btn,
+.continue-btn,
+.restart-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 4px;
+}
+
+.play-again-btn {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+}
+
+.continue-btn {
+  background: linear-gradient(45deg, #00b09b, #96c93d);
+  color: white;
+}
+
+.restart-btn {
+  background: linear-gradient(45deg, #ff9966, #ff5e62);
+  color: white;
+}
+
+.win-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+@media (max-width: 768px) {
+  .cell {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .tile {
+    font-size: 14px;
+  }
+  
+  .tile-128,
+  .tile-256,
+  .tile-512 {
+    font-size: 12px;
+  }
+  
+  .tile-1024,
+  .tile-2048 {
+    font-size: 10px;
+  }
+  
+  .mobile-controls {
+    display: block;
+  }
+}
+
+@media (max-width: 480px) {
+  .cell {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .board {
+    padding: 6px;
+  }
+  
+  .row {
+    margin-bottom: 6px;
+  }
+  
+  .cell {
+    margin-right: 6px;
+  }
+  
+  .mobile-control-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+  
+  .spacer {
+    width: 40px;
+  }
+}

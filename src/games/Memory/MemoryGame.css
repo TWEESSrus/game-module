@@ -1,0 +1,288 @@
+/* MemoryGame.css - С равными расстояниями между карточками */
+
+.memory-game {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  color: #333;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+.memory-game h2 {
+  padding: 12px 16px;
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+  font-weight: 600;
+  border-bottom: 1px solid #e1e5e9;
+  flex-shrink: 0;
+}
+
+.game-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e1e5e9;
+  flex-shrink: 0;
+}
+
+.stat {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #e1e5e9;
+}
+
+.stat span {
+  font-size: 10px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.stat strong {
+  font-size: 18px;
+  color: #667eea;
+  font-weight: 700;
+}
+
+.difficulty-selector {
+  padding: 8px 16px;
+  border-bottom: 1px solid #e1e5e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.difficulty-label {
+  font-size: 11px;
+  color: #666;
+  font-weight: 600;
+}
+
+.difficulty-btn {
+  padding: 6px 12px;
+  background: #f8f9fa;
+  border: 1px solid #e1e5e9;
+  border-radius: 6px;
+  font-size: 10px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.difficulty-btn.active {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border-color: #667eea;
+}
+
+.difficulty-btn:hover:not(.active) {
+  background: #e1e5e9;
+}
+
+/* ИСПРАВЛЕННОЕ ИГРОВОЕ ПОЛЕ - РАВНЫЕ РАССТОЯНИЯ */
+.memory-board-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  min-height: 0;
+  position: relative;
+}
+
+.memory-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px; /* Равные расстояния */
+  padding: 0;
+  align-items: center;
+  justify-items: center;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.memory-card {
+  width: 100%;
+  height: 100%;
+  max-width: 80px;
+  max-height: 80px;
+  min-width: 60px;
+  min-height: 60px;
+  perspective: 1000px;
+  cursor: pointer;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.3s;
+  aspect-ratio: 1; /* Гарантируем квадрат */
+}
+
+.memory-card.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-front,
+.card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  transition: transform 0.6s;
+  box-sizing: border-box;
+}
+
+.card-front {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  font-weight: bold;
+  transform: rotateY(0deg);
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.2);
+}
+
+.card-back {
+  background: white;
+  border: 2px solid #667eea;
+  color: #667eea;
+  transform: rotateY(180deg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-back.matched {
+  background: linear-gradient(45deg, #00b09b, #96c93d);
+  color: white;
+  border-color: #00b09b;
+}
+
+.game-controls {
+  padding: 12px 16px;
+  border-top: 1px solid #e1e5e9;
+  flex-shrink: 0;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.restart-btn {
+  padding: 8px 16px;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.restart-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.game-instructions {
+  padding: 8px 16px;
+  font-size: 10px;
+  color: #666;
+  text-align: center;
+  border-top: 1px solid #e1e5e9;
+  flex-shrink: 0;
+}
+
+.game-instructions p {
+  margin: 4px 0;
+}
+
+/* Анимация для карточек */
+@keyframes match {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.memory-card.matched .card-back {
+  animation: match 0.5s ease;
+}
+
+/* Для разных уровней сложности */
+.memory-board.easy {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.memory-board.medium {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.memory-board.hard {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Адаптивность */
+@media (max-width: 1024px) {
+  .memory-card {
+    max-width: 70px;
+    max-height: 70px;
+  }
+  
+  .card-front,
+  .card-back {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 768px) {
+  .memory-board {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  
+  .memory-card {
+    max-width: 65px;
+    max-height: 65px;
+  }
+  
+  .card-front,
+  .card-back {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .memory-board {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  
+  .memory-card {
+    max-width: 55px;
+    max-height: 55px;
+    min-width: 50px;
+    min-height: 50px;
+  }
+  
+  .card-front,
+  .card-back {
+    font-size: 18px;
+  }
+  
+  .stat strong {
+    font-size: 16px;
+  }
+}

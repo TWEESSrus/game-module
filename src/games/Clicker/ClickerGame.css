@@ -1,0 +1,422 @@
+/* ClickerGame.css - Стили для улучшенного кликера */
+
+.clicker-game {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  color: #333;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e1e5e9;
+  flex-shrink: 0;
+}
+
+.game-header h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+  font-weight: 600;
+}
+
+.header-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.shop-toggle {
+  padding: 6px 12px;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.shop-toggle.active {
+  background: linear-gradient(45deg, #ff9966, #ff5e62);
+}
+
+.shop-toggle:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.game-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e1e5e9;
+  flex-shrink: 0;
+}
+
+.stat-box {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #e1e5e9;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: #666;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #667eea;
+}
+
+.click-count {
+  font-size: 18px;
+  color: #00b09b;
+}
+
+.multiplier {
+  color: #ff9966;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.main-game-area {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.clicker-container {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-right: 1px solid #e1e5e9;
+}
+
+.click-button {
+  width: 200px;
+  height: 200px;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  cursor: pointer;
+  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.click-button:active {
+  transform: scale(0.95);
+  box-shadow: 0 5px 10px rgba(102, 126, 234, 0.2);
+}
+
+.click-button-text {
+  text-align: center;
+}
+
+.click-power {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.click-label {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.click-hint {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.abilities {
+  width: 100%;
+  max-width: 400px;
+}
+
+.abilities h3 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+}
+
+.abilities-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.ability-btn {
+  padding: 8px;
+  background: linear-gradient(45deg, #4cc9f0, #4361ee);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.ability-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(76, 201, 240, 0.3);
+}
+
+.ability-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ability-btn.cooldown {
+  background: linear-gradient(45deg, #666, #999);
+}
+
+.ability-name {
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.ability-cost {
+  font-size: 9px;
+  opacity: 0.9;
+}
+
+.ability-cooldown {
+  font-size: 8px;
+  font-weight: bold;
+}
+
+.shop-panel {
+  flex: 1;
+  padding: 16px;
+  background: #f8f9fa;
+  overflow-y: auto;
+  border-left: 1px solid #e1e5e9;
+}
+
+.shop-panel h3 {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+}
+
+.upgrades-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.upgrade-item {
+  background: white;
+  border-radius: 8px;
+  padding: 10px;
+  border: 2px solid #e1e5e9;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.upgrade-item.purchased {
+  border-color: #00b09b;
+  background: rgba(0, 176, 155, 0.05);
+}
+
+.upgrade-item.affordable:not(.purchased) {
+  border-color: #667eea;
+}
+
+.upgrade-content {
+  flex: 1;
+}
+
+.upgrade-name {
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.upgrade-stats {
+  font-size: 10px;
+  color: #667eea;
+  margin-bottom: 6px;
+}
+
+.upgrade-stats span {
+  display: block;
+}
+
+.upgrade-cost {
+  font-size: 12px;
+  font-weight: bold;
+  color: #ff9966;
+}
+
+.buy-btn {
+  padding: 6px;
+  background: linear-gradient(45deg, #00b09b, #96c93d);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.buy-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.buy-btn:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 176, 155, 0.3);
+}
+
+.achievements {
+  padding: 12px 16px;
+  border-top: 1px solid #e1e5e9;
+  flex-shrink: 0;
+}
+
+.achievements h3 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.achievement {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #e1e5e9;
+  transition: all 0.2s;
+}
+
+.achievement.achieved {
+  background: rgba(255, 215, 0, 0.1);
+  border-color: #ffd700;
+}
+
+.achievement-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.achievement-info {
+  flex: 1;
+}
+
+.achievement-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.achievement-progress {
+  font-size: 8px;
+  color: #666;
+}
+
+.game-instructions {
+  padding: 8px 16px;
+  font-size: 10px;
+  color: #666;
+  text-align: center;
+  border-top: 1px solid #e1e5e9;
+  flex-shrink: 0;
+}
+
+.game-instructions p {
+  margin: 4px 0;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .main-game-area {
+    flex-direction: column;
+  }
+  
+  .clicker-container {
+    border-right: none;
+    border-bottom: 1px solid #e1e5e9;
+    padding: 15px;
+  }
+  
+  .click-button {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 20px;
+  }
+  
+  .abilities-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .upgrades-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .achievements-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .shop-panel {
+    max-height: 200px;
+  }
+}
