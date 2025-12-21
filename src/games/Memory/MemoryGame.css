@@ -1,4 +1,4 @@
-/* MemoryGame.css - С равными расстояниями между карточками */
+/* MemoryGame.css - Квадратное поле для всех режимов */
 
 .memory-game {
   width: 100%;
@@ -92,7 +92,7 @@
   background: #e1e5e9;
 }
 
-/* ИСПРАВЛЕННОЕ ИГРОВОЕ ПОЛЕ - РАВНЫЕ РАССТОЯНИЯ */
+/* ИСПРАВЛЕННОЕ ИГРОВОЕ ПОЛЕ - ВСЕГДА КВАДРАТ */
 .memory-board-container {
   flex: 1;
   display: flex;
@@ -101,32 +101,52 @@
   padding: 16px;
   min-height: 0;
   position: relative;
+  overflow: hidden;
 }
 
 .memory-board {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px; /* Равные расстояния */
-  padding: 0;
+  gap: 8px;
+  padding: 8px;
   align-items: center;
   justify-items: center;
+  width: fit-content;
+  height: fit-content;
   max-width: 100%;
   max-height: 100%;
+  margin: 0 auto;
 }
 
+/* КВАДРАТНЫЕ СЕТКИ ДЛЯ ВСЕХ УРОВНЕЙ */
+
+/* Легкий: 8 пар = 16 карточек = 4×4 */
+.memory-board.easy {
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+}
+
+/* Средний: 12 пар = 24 карточки = 6×4 (горизонтально) */
+.memory-board.medium {
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+}
+
+/* Сложный: 16 пар = 32 карточки = 8×4 (горизонтально) */
+.memory-board.hard {
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+}
+
+/* АДАПТИВНЫЕ КАРТОЧКИ - ОДИНАКОВЫЙ РАЗМЕР ВСЕГДА */
 .memory-card {
-  width: 100%;
-  height: 100%;
-  max-width: 80px;
-  max-height: 80px;
-  min-width: 60px;
-  min-height: 60px;
+  width: 70px;
+  height: 70px;
   perspective: 1000px;
   cursor: pointer;
   position: relative;
   transform-style: preserve-3d;
   transition: transform 0.3s;
-  aspect-ratio: 1; /* Гарантируем квадрат */
+  aspect-ratio: 1;
 }
 
 .memory-card.flipped {
@@ -221,60 +241,38 @@
   animation: match 0.5s ease;
 }
 
-/* Для разных уровней сложности */
-.memory-board.easy {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-.memory-board.medium {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-.memory-board.hard {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-/* Адаптивность */
+/* АДАПТИВНОСТЬ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ */
 @media (max-width: 1024px) {
   .memory-card {
-    max-width: 70px;
-    max-height: 70px;
-  }
-  
-  .card-front,
-  .card-back {
-    font-size: 22px;
-  }
-}
-
-@media (max-width: 768px) {
-  .memory-board {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-  }
-  
-  .memory-card {
-    max-width: 65px;
-    max-height: 65px;
+    width: 60px;
+    height: 60px;
   }
   
   .card-front,
   .card-back {
     font-size: 20px;
   }
+  
+  /* На планшетах уменьшаем колонки */
+  .memory-board.medium {
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+  }
+  
+  .memory-board.hard {
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+  }
 }
 
-@media (max-width: 480px) {
-  .memory-board {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
+@media (max-width: 768px) {
+  .memory-board-container {
+    padding: 10px;
   }
   
   .memory-card {
-    max-width: 55px;
-    max-height: 55px;
-    min-width: 50px;
-    min-height: 50px;
+    width: 50px;
+    height: 50px;
   }
   
   .card-front,
@@ -282,7 +280,64 @@
     font-size: 18px;
   }
   
-  .stat strong {
+  .memory-board {
+    gap: 6px;
+    padding: 6px;
+  }
+  
+  /* На телефонах уменьшаем сетку */
+  .memory-board.easy {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+  }
+  
+  .memory-board.medium {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+  }
+  
+  .memory-board.hard {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .memory-card {
+    width: 45px;
+    height: 45px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+  
+  .card-front,
+  .card-back {
     font-size: 16px;
+  }
+  
+  .memory-board {
+    gap: 5px;
+    padding: 5px;
+  }
+  
+  /* На очень маленьких экранах еще меньше */
+  .memory-card {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .card-front,
+  .card-back {
+    font-size: 14px;
+  }
+  
+  .difficulty-selector {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .difficulty-btn {
+    padding: 4px 8px;
+    font-size: 9px;
   }
 }
