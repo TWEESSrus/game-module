@@ -233,7 +233,6 @@ const Game2048 = () => {
     <div className="game-2048">
       <div className="game-header">
         <div className="header-left">
-          <h2>🔢 2048</h2>
           <div className="game-subtitle">
             Объединяйте плитки, чтобы получить 2048!
           </div>

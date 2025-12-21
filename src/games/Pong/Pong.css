@@ -1,4 +1,4 @@
-/* Pong.css - Исправленная версия без предупреждений */
+/* Pong.css - Полная версия */
 
 .pong-game {
   width: 100%;
@@ -82,6 +82,12 @@
   color: #ff5e62;
 }
 
+.time-value {
+  color: #667eea;
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+}
+
 .game-area {
   flex: 1;
   display: flex;
@@ -156,6 +162,12 @@
   font-size: 14px;
 }
 
+.game-tip {
+  color: #ff9966 !important;
+  font-weight: 600 !important;
+  margin: 10px 0 !important;
+}
+
 .start-btn-big, .play-again-btn {
   padding: 12px 24px;
   background: linear-gradient(45deg, #667eea, #764ba2);
@@ -197,72 +209,64 @@
   font-size: 16px;
 }
 
-.speed-control {
+.speed-info {
   width: 100%;
   max-width: 400px;
   padding: 15px;
   background: #f8f9fa;
   border-radius: 10px;
   border: 1px solid #e1e5e9;
+  text-align: center;
+}
+
+.speed-display {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
 }
 
 .speed-label {
-  font-size: 12px;
-  color: #666;
-  margin-bottom: 8px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.speed-slider {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.speed-slider input[type="range"] {
-  flex: 1;
-  height: 6px;
-  background: linear-gradient(to right, #667eea, #764ba2);
-  border-radius: 3px;
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none; /* Исправлено: добавлено стандартное свойство */
-}
-
-.speed-slider input[type="range"]::-webkit-slider-thumb {
-  width: 20px;
-  height: 20px;
-  background: white;
-  border-radius: 50%;
-  border: 2px solid #667eea;
-  cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none; /* Исправлено: добавлено стандартное свойство */
-}
-
-.speed-slider input[type="range"]::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  background: white;
-  border-radius: 50%;
-  border: 2px solid #667eea;
-  cursor: pointer;
-}
-
-.speed-slider input[type="range"]::-moz-range-track {
-  background: linear-gradient(to right, #667eea, #764ba2);
-  border-radius: 3px;
-  height: 6px;
 }
 
 .speed-value {
-  min-width: 40px;
-  text-align: center;
   font-weight: bold;
-  color: #667eea;
-  font-size: 14px;
+  color: #00b09b;
+  font-size: 16px;
+}
+
+.speed-hint {
+  font-size: 11px;
+  color: #888;
+  line-height: 1.4;
+}
+
+.record-info {
+  color: #ff9966;
+  font-weight: bold;
+  margin: 10px 0 !important;
+}
+
+.streak-message {
+  color: #00b09b;
+  font-weight: bold;
+  margin-top: 10px !important;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes speedUp {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.speed-up-animation {
+  animation: speedUp 0.5s ease;
 }
 
 .game-instructions {
@@ -345,13 +349,12 @@
     gap: 10px;
   }
   
-  .speed-slider {
-    flex-direction: column;
-    gap: 10px;
+  .speed-info {
+    padding: 12px;
   }
   
-  .speed-slider input[type="range"] {
-    width: 100%;
+  .speed-hint {
+    font-size: 10px;
   }
 }
 
@@ -374,4 +377,24 @@
     padding: 10px 20px;
     font-size: 12px;
   }
+  
+  .stat-value {
+    font-size: 16px;
+  }
+}
+
+.reset-btn {
+  background: linear-gradient(135deg, #ff9966, #ff5e62);
+  margin-left: 10px;
+}
+
+.reset-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.reset-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ff8866, #ff4e52);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 94, 98, 0.4);
 }

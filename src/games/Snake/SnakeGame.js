@@ -250,7 +250,6 @@ const SnakeGame = () => {
   return (
     <div className="snake-game">
       <div className="game-header">
-        <h2>🐍 Змейка</h2>
         <div className="game-controls">
           {!gameStarted || gameOver ? (
             <button className="control-btn start-btn" onClick={initializeGame}>

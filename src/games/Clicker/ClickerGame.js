@@ -125,7 +125,6 @@ const ClickerGame = () => {
   return (
     <div className="clicker-game">
       <div className="game-header">
-        <h2>🖱️ Кликер</h2>
         <div className="header-controls">
           <button 
             className={`shop-toggle ${shopOpen ? 'active' : ''}`}

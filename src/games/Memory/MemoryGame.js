@@ -98,7 +98,6 @@ const MemoryGame = () => {
 
   return (
     <div className="memory-game">
-      <h2>Игра "Память"</h2>
       
       <div className="difficulty-selector">
         <div className="difficulty-label">Сложность:</div>
