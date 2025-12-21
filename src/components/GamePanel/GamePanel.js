@@ -4,6 +4,7 @@ import Game2048 from '../../games/Game2048/Game2048';
 import MemoryGame from '../../games/Memory/MemoryGame';
 import ClickerGame from '../../games/Clicker/ClickerGame';
 import Pong from '../../games/Pong/Pong';
+import PlatformerGame from '../../games/Platformer/PlatformerGame'; // ДОБАВИЛ ЭТУ СТРОЧКУ
 import './GamePanel.css';
 
 const GamePanel = ({ currentGame }) => {
@@ -40,6 +41,7 @@ const GamePanel = ({ currentGame }) => {
       case 'memory': return '🧠 Память';
       case 'clicker': return '🖱️ Кликер';
       case 'pong': return '🏓 Пинг-Понг';
+      case 'platformer': return '👾 Платформер'; // ДОБАВИЛ ЭТУ СТРОЧКУ
       default: return 'Игровая панель';
     }
   };
@@ -56,6 +58,8 @@ const GamePanel = ({ currentGame }) => {
         return <ClickerGame />;
       case 'pong':
         return <Pong />;
+      case 'platformer': // ДОБАВИЛ ЭТОТ КЕЙС
+        return <PlatformerGame />;
       default:
         return (
           <div className="game-placeholder">

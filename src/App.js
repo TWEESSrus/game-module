@@ -67,6 +67,17 @@ const defaultNodes = [
       gameId: 'pong',
       score: 0 
     },
+  },
+  // ДОБАВИЛ НОВУЮ НОДУ ДЛЯ ПЛАТФОРМЕРА
+  {
+    id: '6',
+    type: 'gameNode',
+    position: { x: 100, y: 850 },
+    data: { 
+      label: 'Платформер', 
+      gameId: 'platformer',
+      score: 0 
+    },
   }
 ];
 
