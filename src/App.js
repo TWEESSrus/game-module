@@ -5,6 +5,7 @@ import ReactFlow, {
   Background,
   applyNodeChanges,
   applyEdgeChanges,
+  ReactFlowProvider,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import './App.css';
@@ -25,7 +26,6 @@ const initialNodes = [
       gameId: 'snake',
       score: 0 
     },
-    draggable: true,
   },
   {
     id: '2',
@@ -36,7 +36,6 @@ const initialNodes = [
       gameId: '2048',
       score: 0 
     },
-    draggable: true,
   },
   {
     id: '3',
@@ -47,7 +46,6 @@ const initialNodes = [
       gameId: 'memory',
       score: 0 
     },
-    draggable: true,
   },
   {
     id: '4',
@@ -58,7 +56,6 @@ const initialNodes = [
       gameId: 'clicker',
       score: 0 
     },
-    draggable: true,
   },
 ];
 
@@ -68,6 +65,7 @@ function App() {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
   const [currentGame, setCurrentGame] = useState(null);
+  const [panelVisible, setPanelVisible] = useState(false);
 
   const onNodesChange = useCallback(
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -81,37 +79,73 @@ function App() {
 
   const onNodeClick = useCallback((event, node) => {
     setCurrentGame(node.data.gameId);
+    setPanelVisible(true);
+  }, []);
+
+  const onPaneClick = useCallback(() => {
+    setPanelVisible(false);
+    setCurrentGame(null);
   }, []);
 
   return (
     <div className="app">
       <div className="header">
-        <h1>Игровой блок на платформе обучения
-          
-        </h1>
+        <h1>Игровой блок на платформе обучения</h1>
         <p>Перетаскивайте игры • Сохраняйте связи</p>
+        {!panelVisible && (
+          <div className="hint">
+            👆 Нажмите на любую игру, чтобы открыть игровую панель
+          </div>
+        )}
       </div>
       
       <div className="main-content">
         <div className="flow-container">
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onNodeClick={onNodeClick}
-            nodeTypes={nodeTypes}
-            fitView
-          >
-            <Background variant="dots" gap={12} size={1} />
-            <Controls />
-            <MiniMap />
-          </ReactFlow>
+          <ReactFlowProvider>
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onNodeClick={onNodeClick}
+              onPaneClick={onPaneClick}
+              nodeTypes={nodeTypes}
+              fitView
+            >
+              <Background variant="dots" gap={12} size={1} />
+              <Controls />
+              <MiniMap />
+            </ReactFlow>
+          </ReactFlowProvider>
         </div>
         
-        <div className="game-container">
-          <GamePanel currentGame={currentGame} />
-        </div>
+        {panelVisible ? (
+          <div className="game-container">
+            <GamePanel currentGame={currentGame} />
+          </div>
+        ) : (
+          <div className="game-container placeholder">
+            <div className="placeholder-content">
+              <div className="placeholder-icon">🎮</div>
+              <h3>Игровая панель</h3>
+              <p>Выберите игру из списка слева</p>
+              <div className="placeholder-tips">
+                <div className="tip">
+                  <span>👈</span>
+                  <p>Нажмите на любую игру</p>
+                </div>
+                <div className="tip">
+                  <span>🎯</span>
+                  <p>Игра откроется здесь</p>
+                </div>
+                <div className="tip">
+                  <span>💾</span>
+                  <p>Сохраняйте свой прогресс</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

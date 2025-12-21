@@ -26,12 +26,6 @@ html, body {
   display: flex;
   flex-direction: column;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow: hidden;
 }
 
 .header {
@@ -41,7 +35,6 @@ html, body {
   text-align: center;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
-  z-index: 100;
 }
 
 .header h1 {
@@ -49,6 +42,7 @@ html, body {
   font-size: 24px;
   background: linear-gradient(45deg, #667eea, #764ba2);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 700;
 }
@@ -59,54 +53,44 @@ html, body {
   font-size: 14px;
 }
 
+.hint {
+  margin-top: 10px;
+  padding: 8px 16px;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 8px;
+  color: #667eea;
+  font-size: 14px;
+  display: inline-block;
+}
+
 .main-content {
   display: flex;
   flex: 1;
   min-height: 0;
   padding: 15px;
   gap: 15px;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 120px);
 }
 
 .flow-container {
   flex: 1;
-  min-width: 300px;
   background: white;
   border-radius: 12px;
-  padding: 10px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid #e1e5e9;
   position: relative;
   overflow: hidden;
 }
 
-.game-container {
-  flex: 1;
-  min-width: 300px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e1e5e9;
-  overflow: hidden;
-  position: relative;
+/* React Flow стили */
+.reactflow-wrapper {
+  width: 100%;
+  height: 100%;
 }
 
-/* Реакт Флоу стили */
 .react-flow {
   width: 100% !important;
   height: 100% !important;
-}
-
-.react-flow__viewport {
-  transform: none !important;
-}
-
-.react-flow__renderer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
 }
 
 .react-flow__controls {
@@ -140,36 +124,7 @@ html, body {
   color: rgba(102, 126, 234, 0.1) !important;
 }
 
-.react-flow-controls {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 10;
-  display: flex;
-  gap: 8px;
-}
-
-.control-btn {
-  background: linear-gradient(45deg, #667eea, #764ba2);
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 16px;
-  font-size: 11px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  box-shadow: 0 2px 5px rgba(102, 126, 234, 0.3);
-}
-
-.control-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
-}
-
-/* Стили для GameNode */
+/* Стили для GameNode карточек */
 .game-node {
   position: relative;
   transition: all 0.3s ease;
@@ -318,6 +273,77 @@ html, body {
   from { stroke-dashoffset: 10; }
 }
 
+/* Плейсхолдер справа */
+.game-container {
+  flex: 1;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e1e5e9;
+  overflow: hidden;
+}
+
+.game-container.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+}
+
+.placeholder-content {
+  text-align: center;
+  padding: 40px;
+  max-width: 400px;
+}
+
+.placeholder-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  opacity: 0.7;
+}
+
+.placeholder-content h3 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.placeholder-content p {
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 16px;
+}
+
+.placeholder-tips {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.tip {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #e1e5e9;
+  text-align: left;
+}
+
+.tip span {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.tip p {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+}
+
 /* Адаптивность */
 @media (max-width: 768px) {
   .main-content {
@@ -329,10 +355,25 @@ html, body {
   .game-container {
     flex: none;
     height: 45vh;
-    min-width: 0;
   }
   
   .header h1 {
     font-size: 20px;
+  }
+
+  .game-container.placeholder {
+    height: 45vh;
+  }
+
+  .placeholder-content {
+    padding: 20px;
+  }
+  
+  .placeholder-icon {
+    font-size: 48px;
+  }
+  
+  .tip {
+    padding: 12px;
   }
 }

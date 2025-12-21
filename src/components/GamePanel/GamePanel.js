@@ -16,7 +16,10 @@ const GamePanel = ({ currentGame }) => {
     };
 
     window.addEventListener('gameScoreUpdate', handleScoreUpdate);
-    return () => window.removeEventListener('gameScoreUpdate', handleScoreUpdate);
+    
+    return () => {
+      window.removeEventListener('gameScoreUpdate', handleScoreUpdate);
+    };
   }, [currentGame]);
 
   const updateNodeScore = () => {
@@ -75,17 +78,26 @@ const GamePanel = ({ currentGame }) => {
   };
 
   return (
-    <div className="game-panel">
+    <div className={`game-panel`}>
       <div className="panel-header">
-        <h2 className="panel-title">{getGameTitle()}</h2>
+        <div className="panel-title-wrapper">
+          <h2 className="panel-title">{getGameTitle()}</h2>
+          {currentGame && (
+            <div className="current-score">
+              Счет: <strong>{currentScore}</strong>
+            </div>
+          )}
+        </div>
         
-        {currentGame && (
-          <div className="panel-actions">
-            <button className="save-score-btn" onClick={updateNodeScore}>
-              💾 Сохранить счет
-            </button>
-          </div>
-        )}
+        <div className="panel-actions">
+          {currentGame && (
+            <>
+              <button className="save-score-btn" onClick={updateNodeScore}>
+                💾 Сохранить счет
+              </button>
+            </>
+          )}
+        </div>
       </div>
       
       <div className="game-content">
