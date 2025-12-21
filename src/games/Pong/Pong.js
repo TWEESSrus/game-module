@@ -234,20 +234,42 @@ const Pong = () => {
     // Максимальная скорость движения компьютера
     const maxComputerSpeed = 1.5; // Можете настроить (было неограничено)
     if (Math.abs(moveAmount) > maxComputerSpeed) {
-    moveAmount = Math.sign(moveAmount) * maxComputerSpeed;
+      moveAmount = Math.sign(moveAmount) * maxComputerSpeed;
     }
 
     // Применяем ограниченное движение
     computer.y += moveAmount;
+    
     // Ограничение движения ракеток
     computer.y = Math.max(0, Math.min(canvasHeight - computer.height, computer.y));
     player.y = Math.max(0, Math.min(canvasHeight - player.height, player.y));
 
-    // Отскок от стен
-    if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvasHeight) {
-      ball.velocityY = -ball.velocityY;
-      // Небольшая случайность при отскоке от стен
-      ball.velocityY += (Math.random() - 0.5) * 0.2;
+    // Отскок от стен с исправлением горизонтального движения
+    if (ball.y - ball.radius < 0) {
+      // Удар о верхнюю стену
+      ball.y = ball.radius + 1; // Прижимаем мяч к границе
+      ball.velocityY = Math.abs(ball.velocityY) * 0.9; // Гарантируем отскок вниз
+      ball.velocityY += (Math.random() * 0.15); // Добавляем случайность
+    } 
+    else if (ball.y + ball.radius > canvasHeight) {
+      // Удар о нижнюю стену
+      ball.y = canvasHeight - ball.radius - 1; // Прижимаем мяч к границе
+      ball.velocityY = -Math.abs(ball.velocityY) * 0.9; // Гарантируем отскок вверх
+      ball.velocityY -= (Math.random() * 0.15); // Добавляем случайность
+    }
+
+    // Гарантируем минимальный вертикальный угол (исправление горизонтального коридора)
+    const minVerticalSpeed = 0.4;
+    if (Math.abs(ball.velocityY) < minVerticalSpeed) {
+      const sign = ball.velocityY >= 0 ? 1 : -1;
+      ball.velocityY = sign * minVerticalSpeed;
+    }
+
+    // Дополнительная проверка на горизонтальное залипание
+    const isHorizontalStuck = Math.abs(ball.velocityY) < 0.2 && Math.abs(ball.velocityX) > 1;
+    if (isHorizontalStuck) {
+      // Принудительно добавляем вертикальное движение
+      ball.velocityY += (Math.random() - 0.5) * 0.5;
     }
 
     // Проверка столкновений с обеими ракетками
