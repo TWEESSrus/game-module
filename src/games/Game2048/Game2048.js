@@ -78,20 +78,21 @@ const Game2048 = () => {
     return moved;
   }, [score]);
 
-  // ИСПРАВЛЕННАЯ ФУНКЦИЯ ПОВОРОТА
-  const rotateBoard = (boardCopy, times = 1) => {
+  // ИСПРАВЛЕННАЯ ФУНКЦИЯ ПОВОРОТА - не мутирует исходный массив
+  const rotateBoard = (boardToRotate, times = 1) => {
+    let result = boardToRotate.map(row => [...row]);
+    
     for (let t = 0; t < times; t++) {
       const newBoard = Array(4).fill().map(() => Array(4).fill(0));
       for (let i = 0; i < 4; i++) {
         for (let j = 0; j < 4; j++) {
-          newBoard[j][3 - i] = boardCopy[i][j];
+          newBoard[j][3 - i] = result[i][j];
         }
       }
-      for (let i = 0; i < 4; i++) {
-        boardCopy[i] = newBoard[i];
-      }
+      result = newBoard;
     }
-    return boardCopy;
+    
+    return result;
   };
 
   const move = useCallback((direction) => {
@@ -114,17 +115,17 @@ const Game2048 = () => {
         setLastMove({ direction: 'right', oldBoard, newBoard: boardCopy });
         break;
       case 'up':
-        // ИСПРАВЛЕНО: для движения вверх сначала поворачиваем, двигаем влево, потом поворачиваем обратно
-        boardCopy = rotateBoard(boardCopy, 3);
+        // Правильный поворот для движения вверх
+        boardCopy = rotateBoard(boardCopy, 3); // Поворачиваем 3 раза против часовой
         moved = moveLeft(boardCopy);
-        boardCopy = rotateBoard(boardCopy, 1);
+        boardCopy = rotateBoard(boardCopy, 1); // Поворачиваем обратно (по часовой)
         setLastMove({ direction: 'up', oldBoard, newBoard: boardCopy });
         break;
       case 'down':
-        // ИСПРАВЛЕНО: для движения вниз
-        boardCopy = rotateBoard(boardCopy, 1);
+        // Правильный поворот для движения вниз
+        boardCopy = rotateBoard(boardCopy, 1); // Поворачиваем по часовой
         moved = moveLeft(boardCopy);
-        boardCopy = rotateBoard(boardCopy, 3);
+        boardCopy = rotateBoard(boardCopy, 3); // Поворачиваем обратно
         setLastMove({ direction: 'down', oldBoard, newBoard: boardCopy });
         break;
       default:

@@ -53,14 +53,96 @@ html, body {
   font-size: 14px;
 }
 
+/* Стили для header-controls */
+.header-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+/* УЛУЧШЕННАЯ КНОПКА СБРОСА */
+.reset-btn {
+  padding: 10px 18px;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.reset-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.reset-btn:hover::before {
+  left: 100%;
+}
+
+.reset-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+  background: linear-gradient(45deg, #764ba2, #667eea);
+}
+
+.reset-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.reset-icon {
+  font-size: 16px;
+  animation: spin 2s linear infinite paused;
+}
+
+.reset-btn:hover .reset-icon {
+  animation-play-state: running;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.reset-text {
+  letter-spacing: 0.3px;
+}
+
+/* Обновленный hint */
 .hint {
-  margin-top: 10px;
-  padding: 8px 16px;
-  background: rgba(102, 126, 234, 0.1);
-  border-radius: 8px;
+  flex: 1;
+  margin-top: 0;
+  padding: 12px 18px;
+  background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  border-radius: 10px;
   color: #667eea;
   font-size: 14px;
   display: inline-block;
+  border-left: 4px solid #667eea;
+  animation: pulseHint 2s infinite;
+}
+
+@keyframes pulseHint {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.9; }
 }
 
 .main-content {
@@ -69,7 +151,7 @@ html, body {
   min-height: 0;
   padding: 15px;
   gap: 15px;
-  height: calc(100vh - 120px);
+  height: calc(100vh - 140px);
 }
 
 .flow-container {
@@ -375,5 +457,26 @@ html, body {
   
   .tip {
     padding: 12px;
+  }
+
+  .header-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  .hint, .reset-btn {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+  
+  .hint {
+    padding: 10px 15px;
+    font-size: 13px;
+  }
+  
+  .reset-btn {
+    padding: 10px 15px;
   }
 }

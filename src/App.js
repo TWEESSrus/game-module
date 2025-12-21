@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -16,7 +16,8 @@ const nodeTypes = {
   gameNode: GameNode,
 };
 
-const initialNodes = [
+// Начальные узлы по умолчанию
+const defaultNodes = [
   {
     id: '1',
     type: 'gameNode',
@@ -62,10 +63,20 @@ const initialNodes = [
 const initialEdges = [];
 
 function App() {
-  const [nodes, setNodes] = useState(initialNodes);
+  // Загружаем сохраненные узлы или используем начальные
+  const [nodes, setNodes] = useState(() => {
+    const savedNodes = localStorage.getItem('gameNodes');
+    return savedNodes ? JSON.parse(savedNodes) : defaultNodes;
+  });
+  
   const [edges, setEdges] = useState(initialEdges);
   const [currentGame, setCurrentGame] = useState(null);
   const [panelVisible, setPanelVisible] = useState(false);
+
+  // Сохраняем узлы в localStorage при изменении
+  useEffect(() => {
+    localStorage.setItem('gameNodes', JSON.stringify(nodes));
+  }, [nodes]);
 
   const onNodesChange = useCallback(
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -77,9 +88,15 @@ function App() {
     []
   );
 
-  const onNodeClick = useCallback((event, node) => {
+  const onNodeClick = useCallback((reactFlowEvent, node) => {
     setCurrentGame(node.data.gameId);
     setPanelVisible(true);
+    
+    // Анимируем ноду при клике
+    const gameEvent = new CustomEvent('gameStatusUpdate', {
+      detail: { gameId: node.data.gameId, isPlaying: true }
+    });
+    window.dispatchEvent(gameEvent);
   }, []);
 
   const onPaneClick = useCallback(() => {
@@ -87,16 +104,35 @@ function App() {
     setCurrentGame(null);
   }, []);
 
+  // Функция сброса позиций
+  const resetPositions = useCallback(() => {
+    if (window.confirm('Сбросить все узлы в начальные позиции?')) {
+      setNodes(defaultNodes);
+    }
+  }, []);
+
   return (
     <div className="app">
       <div className="header">
         <h1>Игровой блок на платформе обучения</h1>
-        <p>Перетаскивайте игры • Сохраняйте связи</p>
-        {!panelVisible && (
-          <div className="hint">
-            👆 Нажмите на любую игру, чтобы открыть игровую панель
-          </div>
-        )}
+        <p>Перетаскивайте игры • Сохраняйте связи • Позиции сохраняются автоматически</p>
+        
+        <div className="header-controls">
+          {!panelVisible && (
+            <div className="hint">
+              👆 Нажмите на любую игру, чтобы открыть игровую панель
+            </div>
+          )}
+          
+          <button 
+            className="reset-btn"
+            onClick={resetPositions}
+            title="Вернуть все игры на начальные позиции"
+          >
+            <span className="reset-icon">🔄</span>
+            <span className="reset-text">Сбросить позиции</span>
+          </button>
+        </div>
       </div>
       
       <div className="main-content">
@@ -140,7 +176,7 @@ function App() {
                 </div>
                 <div className="tip">
                   <span>💾</span>
-                  <p>Сохраняйте свой прогресс</p>
+                  <p>Позиции сохраняются автоматически</p>
                 </div>
               </div>
             </div>
