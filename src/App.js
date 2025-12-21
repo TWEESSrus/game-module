@@ -58,6 +58,16 @@ const defaultNodes = [
       score: 0 
     },
   },
+  {
+    id: '5',
+    type: 'gameNode',
+    position: { x: 100, y: 700 },
+    data: { 
+      label: 'Пинг-Понг', 
+      gameId: 'pong',
+      score: 0 
+    },
+  }
 ];
 
 const initialEdges = [];

@@ -33,6 +33,7 @@ const GameNode = memo(({ data, id, selected }) => {
       case '2048': return '🔢';
       case 'memory': return '🧠';
       case 'clicker': return '🖱️';
+      case 'pong': return '🏓';
       default: return '🎮';
     }
   };
@@ -43,6 +44,7 @@ const GameNode = memo(({ data, id, selected }) => {
       case '2048': return '#667eea';
       case 'memory': return '#ff9966';
       case 'clicker': return '#4cc9f0';
+      case 'pong': return '#ff5e62';
       default: return '#667eea';
     }
   };

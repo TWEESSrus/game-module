@@ -3,6 +3,7 @@ import SnakeGame from '../../games/Snake/SnakeGame';
 import Game2048 from '../../games/Game2048/Game2048';
 import MemoryGame from '../../games/Memory/MemoryGame';
 import ClickerGame from '../../games/Clicker/ClickerGame';
+import Pong from '../../games/Pong/Pong';
 import './GamePanel.css';
 
 const GamePanel = ({ currentGame }) => {
@@ -38,6 +39,7 @@ const GamePanel = ({ currentGame }) => {
       case '2048': return '🔢 2048';
       case 'memory': return '🧠 Память';
       case 'clicker': return '🖱️ Кликер';
+      case 'pong': return '🏓 Пинг-Понг';
       default: return 'Игровая панель';
     }
   };
@@ -52,6 +54,8 @@ const GamePanel = ({ currentGame }) => {
         return <MemoryGame />;
       case 'clicker':
         return <ClickerGame />;
+      case 'pong':
+        return <Pong />;
       default:
         return (
           <div className="game-placeholder">
