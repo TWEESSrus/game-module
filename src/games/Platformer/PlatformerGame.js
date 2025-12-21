@@ -17,7 +17,7 @@ const PlatformerGame = () => {
   const keysRef = useRef({ left: false, right: false, up: false });
   const deathAnimationRef = useRef({ active: false, time: 0, scale: 1 });
 
-  // Уровни игры (оригинальные с небольшими изменениями для размера)
+  // Уровни игры
   const LEVELS = [
     [
       "                                                                                ",
@@ -76,6 +76,56 @@ const PlatformerGame = () => {
       "!!!!x x!!!!!!x         x!!!!!xx       xxxxxxxxxxxxxx!!!!!!xx   !                                                  ",
       "!!!!x x!!!!!!x         x!!!!!!xxxxxxxxx!!!!!!!!!!!!!!!!!!xx    !                                                  ",
       "!!!!x x!!!!!!x         x!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!xx     !                                                  "
+    ],
+    // Третий уровень (прототип)
+    [
+      "                                                                                                              ",
+      "                                                                                                              ",
+      "                                                                                                              ",
+      "                                                                                                              ",
+      "                                                                                                              ",
+      "                                        o                                                                     ",
+      "                                                                                                              ",
+      "                                        x                                                                     ",
+      "                                        x                                                                     ",
+      "                                        x                                                                     ",
+      "                                        x                                                                     ",
+      "                                       xxx                                                                    ",
+      "                                       x x                 !!!        !!!  xxx                                ",
+      "                                       x x                 !x!        !x!                                     ",
+      "                                     xxx xxx                x          x                                      ",
+      "                                      x   x                 x   oooo   x       xxx                            ",
+      "                                      x   x                 x          x      x!!!x                           ",
+      "                                      x   x                 xxxxxxxxxxxx       xxx                            ",
+      "                                     xx   xx      x   x      x                                                ",
+      "                                      x   xxxxxxxxx   xxxxxxxx              x x                               ",
+      "                                      x   x           x                    x!!!x                              ",
+      "                                      x   x           x                     xxx                               ",
+      "                                     xx   xx          x                                                       ",
+      "                                      x   x= = = =    x            xxx                                        ",
+      "                                      x   x           x           x!!!x                                       ",
+      "                                      x   x    = = = =x     o      xxx       xxx                              ",
+      "                                     xx   xx          x                     x!!!x                             ",
+      "                              o   o   x   x           x     x                xxv        xxx                   ",
+      "                                      x   x           x              x                 x!!!x                  ",
+      "                             xxx xxx xxx xxx     o o  x!!!!!!!!!!!!!!x                   vx                   ",
+      "                             x xxx x x xxx x          x!!!!!!!!!!!!!!x                                        ",
+      "                             x             x   xxxxxxxxxxxxxxxxxxxxxxx                                        ",
+      "                             xx           xx                                         xxx                      ",
+      "  xxx                         x     x     x                                         x!!!x                xxx  ",
+      "  x x                         x    xxx    x                                          xxx                 x x  ",
+      "  x                           x    xxx    xxxxxxx                        xxxxx                             x  ",
+      "  x                           x           x                              x   x                             x  ",
+      "  x                           xx          x                              x x x                             x  ",
+      "  x                                       x       |xxxx|    |xxxx|     xxx xxx                             x  ",
+      "  x                xxx             o o    x                              x         xxx                     x  ",
+      "  x               xxxxx       xx          x                             xxx       x!!!x          x         x  ",
+      "  x               oxxxo       x    xxx    x                             x x        xxx          xxx        x  ",
+      "  x                xxx        xxxxxxxxxxxxx  x oo x    x oo x    x oo  xx xx                    xxx        x  ",
+      "  x      @          x         x           x!!x    x!!!!x    x!!!!x    xx   xx                    x         x  ",
+      "  xxxxxxxxxxxxxxxxxxxxxxxxxxxxx           xxxxxxxxxxxxxxxxxxxxxxxxxxxxx     xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  ",
+      "                                                                                                              ",
+      "                                                                                                              "
     ]
   ];
 
@@ -103,6 +153,8 @@ const PlatformerGame = () => {
       this.speed = new Vector(0, 0);
       this.type = "player";
       this.alive = true;
+      this.canJump = false;
+      this.jumpCooldown = 0;
     }
 
     moveX(step, level, keys) {
@@ -115,7 +167,7 @@ const PlatformerGame = () => {
       const newPos = this.pos.plus(motion);
       const obstacle = level.obstacleAt(newPos, this.size);
       
-      if (!obstacle) {
+      if (!obstacle || obstacle === "lava") {
         this.pos = newPos;
       }
     }
@@ -130,13 +182,31 @@ const PlatformerGame = () => {
       const obstacle = level.obstacleAt(newPos, this.size);
       
       if (obstacle) {
-        if (keys.up && obstacle === "wall" && this.speed.y > 0) {
+        if (obstacle === "lava") {
+          // Если коснулись лавы - смерть
+          this.alive = false;
+          level.status = "lost";
+          this.speed.y = 0;
+          return;
+        }
+        
+        // Если уперлись в стену
+        if (keys.up && this.canJump && this.jumpCooldown <= 0) {
           this.speed.y = -jumpSpeed;
+          this.canJump = false;
+          this.jumpCooldown = 0.2;
         } else {
           this.speed.y = 0;
+          this.canJump = true;
         }
       } else {
         this.pos = newPos;
+        this.canJump = false;
+      }
+      
+      // Охлаждение прыжка
+      if (this.jumpCooldown > 0) {
+        this.jumpCooldown -= step;
       }
     }
 
@@ -181,6 +251,7 @@ const PlatformerGame = () => {
       this.pos = pos;
       this.size = new Vector(1, 1);
       this.type = "lava";
+      this.char = ch;
       
       if (ch === "=") {
         this.speed = new Vector(2, 0);
@@ -189,18 +260,23 @@ const PlatformerGame = () => {
       } else if (ch === 'v') {
         this.speed = new Vector(0, 3);
         this.repeatPos = pos;
+      } else if (ch === '!') {
+        this.speed = new Vector(0, 0); // Статичная лава
       }
     }
 
     act(step, level) {
-      const newPos = this.pos.plus(this.speed.times(step));
-      if (!level.obstacleAt(newPos, this.size)) {
-        this.pos = newPos;
-      } else if (this.repeatPos) {
-        this.pos = this.repeatPos;
-      } else {
-        this.speed = this.speed.times(-1);
+      if (this.char === "=" || this.char === '|' || this.char === 'v') {
+        const newPos = this.pos.plus(this.speed.times(step));
+        if (!level.obstacleAt(newPos, this.size)) {
+          this.pos = newPos;
+        } else if (this.repeatPos) {
+          this.pos = this.repeatPos;
+        } else {
+          this.speed = this.speed.times(-1);
+        }
       }
+      // Статичная лава ('!') не двигается
     }
   }
 
@@ -219,7 +295,8 @@ const PlatformerGame = () => {
         "o": Coin,
         "=": Lava,
         "|": Lava,
-        "v": Lava
+        "v": Lava,
+        "!": Lava
       };
 
       for (let y = 0; y < this.height; y++) {
@@ -285,9 +362,30 @@ const PlatformerGame = () => {
     }
 
     checkCollisions() {
-      if (!this.player.alive) return;
+      if (!this.player || !this.player.alive) return;
 
-      // Проверка столкновения с лавой
+      // Проверка столкновения с лавой (через сетку)
+      const playerGridX = Math.floor(this.player.pos.x);
+      const playerGridY = Math.floor(this.player.pos.y);
+      const playerEndX = Math.ceil(this.player.pos.x + this.player.size.x);
+      const playerEndY = Math.ceil(this.player.pos.y + this.player.size.y);
+
+      for (let y = playerGridY; y < playerEndY; y++) {
+        if (y < 0 || y >= this.height) continue;
+        
+        for (let x = playerGridX; x < playerEndX; x++) {
+          if (x < 0 || x >= this.width) continue;
+          
+          if (this.grid[y][x] === "lava") {
+            this.player.alive = false;
+            this.status = "lost";
+            deathAnimationRef.current = { active: true, time: 0, scale: 1 };
+            return;
+          }
+        }
+      }
+
+      // Проверка столкновения с лавой (актеры)
       for (const actor of this.actors) {
         if (actor.type === "lava" &&
             this.player.pos.x + this.player.size.x > actor.pos.x &&
@@ -382,7 +480,7 @@ const PlatformerGame = () => {
 
   // Обновление камеры
   const updateCamera = useCallback((playerPos, canvasWidth, canvasHeight, levelWidth, levelHeight) => {
-    if (!gameStateRef.current) return;
+    if (!gameStateRef.current || !playerPos) return;
     
     const scale = 12;
     const viewportWidth = canvasWidth / scale;
@@ -418,7 +516,7 @@ const PlatformerGame = () => {
       state.level.animate(timeStep, keysRef.current);
 
       // Обновляем камеру
-      if (state.level.player) {
+      if (state.level.player && state.level.player.alive) {
         updateCamera(
           state.level.player.pos,
           canvasRef.current.width,
@@ -507,6 +605,12 @@ const PlatformerGame = () => {
           const pulse = Math.sin(Date.now() / 200) * 0.2 + 0.8;
           ctx.fillStyle = `rgb(${Math.floor(229 * pulse)}, ${Math.floor(85 * pulse)}, ${Math.floor(85 * pulse)})`;
           ctx.fillRect(screenX, screenY, scale, scale);
+          
+          // Рисуем узор на лаве
+          if (Date.now() % 500 < 250) {
+            ctx.fillStyle = 'rgba(255, 100, 100, 0.3)';
+            ctx.fillRect(screenX + 2, screenY + 2, scale - 4, scale - 4);
+          }
         }
       }
     }
@@ -538,6 +642,17 @@ const PlatformerGame = () => {
             actor.size.x * scale,
             actor.size.y * scale
           );
+          
+          // Рисуем крестик при смерти
+          ctx.strokeStyle = '#800000';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(-actor.size.x * scale / 3, -actor.size.y * scale / 3);
+          ctx.lineTo(actor.size.x * scale / 3, actor.size.y * scale / 3);
+          ctx.moveTo(actor.size.x * scale / 3, -actor.size.y * scale / 3);
+          ctx.lineTo(-actor.size.x * scale / 3, actor.size.y * scale / 3);
+          ctx.stroke();
+          
           ctx.restore();
         } else {
           ctx.fillStyle = gameLevel.status === "won" ? '#4CAF50' : '#335699';
@@ -546,8 +661,22 @@ const PlatformerGame = () => {
           // Рисуем глаза
           ctx.fillStyle = 'white';
           const eyeSize = scale * 0.2;
-          ctx.fillRect(screenX + scale * 0.1, screenY + scale * 0.2, eyeSize, eyeSize);
-          ctx.fillRect(screenX + scale * 0.3, screenY + scale * 0.2, eyeSize, eyeSize);
+          const eyeOffset = actor.speed.x > 0 ? scale * 0.3 : scale * 0.1;
+          ctx.fillRect(screenX + eyeOffset, screenY + scale * 0.2, eyeSize, eyeSize);
+          ctx.fillRect(screenX + eyeOffset + scale * 0.2, screenY + scale * 0.2, eyeSize, eyeSize);
+          
+          // Рисуем улыбку
+          ctx.strokeStyle = 'white';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(
+            screenX + actor.size.x * scale / 2,
+            screenY + scale * 0.6,
+            scale * 0.2,
+            0.2,
+            Math.PI - 0.2
+          );
+          ctx.stroke();
         }
       } else if (actor.type === "coin" && !actor.collected) {
         // Анимация монетки
@@ -564,7 +693,7 @@ const PlatformerGame = () => {
         ctx.fill();
         
         // Блеск монетки
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
         ctx.beginPath();
         ctx.arc(
           screenX + actor.size.x * scale / 2 - scale * 0.15,
@@ -574,9 +703,47 @@ const PlatformerGame = () => {
           Math.PI * 2
         );
         ctx.fill();
+        
+        // Блестящие лучи
+        ctx.strokeStyle = 'rgba(255, 255, 200, 0.6)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 4; i++) {
+          const angle = actor.wobble + i * Math.PI / 2;
+          const length = scale * 0.4;
+          ctx.beginPath();
+          ctx.moveTo(
+            screenX + actor.size.x * scale / 2,
+            screenY + actor.size.y * scale / 2 + wobble * scale
+          );
+          ctx.lineTo(
+            screenX + actor.size.x * scale / 2 + Math.cos(angle) * length,
+            screenY + actor.size.y * scale / 2 + wobble * scale + Math.sin(angle) * length
+          );
+          ctx.stroke();
+        }
       } else if (actor.type === "lava") {
-        ctx.fillStyle = '#e55';
+        // Динамическая лава
+        if (actor.char === "=" || actor.char === '|' || actor.char === 'v') {
+          const pulse = Math.sin(Date.now() / 150) * 0.3 + 0.7;
+          ctx.fillStyle = `rgb(${Math.floor(255 * pulse)}, ${Math.floor(100 * pulse)}, ${Math.floor(100 * pulse)})`;
+        } else {
+          // Статичная лава
+          const pulse = Math.sin(Date.now() / 300) * 0.2 + 0.8;
+          ctx.fillStyle = `rgb(${Math.floor(229 * pulse)}, ${Math.floor(85 * pulse)}, ${Math.floor(85 * pulse)})`;
+        }
         ctx.fillRect(screenX, screenY, actor.size.x * scale, actor.size.y * scale);
+        
+        // Пузыри в лаве
+        if (Math.random() < 0.02) {
+          const bubbleX = screenX + Math.random() * actor.size.x * scale;
+          const bubbleY = screenY + Math.random() * actor.size.y * scale;
+          const bubbleSize = Math.random() * 3 + 1;
+          
+          ctx.fillStyle = 'rgba(255, 200, 200, 0.6)';
+          ctx.beginPath();
+          ctx.arc(bubbleX, bubbleY, bubbleSize, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
     });
 
@@ -589,10 +756,19 @@ const PlatformerGame = () => {
   // Управление клавишами
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Рестарт кнопкой R в любое время
+      if (e.key.toLowerCase() === 'r') {
+        e.preventDefault();
+        resetGame();
+        return;
+      }
+      
       if (!gameActive && e.key === 'Enter') {
         startGame();
         return;
       }
+      
+      if (!gameActive) return;
       
       switch(e.key.toLowerCase()) {
         case 'arrowleft':
@@ -608,15 +784,12 @@ const PlatformerGame = () => {
         case ' ':
           keysRef.current.up = true;
           break;
-        case 'r':
-          if (!gameActive) {
-            resetGame();
-          }
-          break;
       }
     };
 
     const handleKeyUp = (e) => {
+      if (!gameActive) return;
+      
       switch(e.key.toLowerCase()) {
         case 'arrowleft':
         case 'a':
@@ -661,7 +834,7 @@ const PlatformerGame = () => {
   }, [gameActive, gameLoop]);
 
   // Сброс игры
-  const resetGame = () => {
+  const resetGame = useCallback(() => {
     setScore(0);
     setLevel(0);
     setLives(3);
@@ -672,7 +845,18 @@ const PlatformerGame = () => {
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     }
-  };
+    
+    deathAnimationRef.current = { active: false, time: 0, scale: 1 };
+    
+    // Инициализируем заново через небольшой таймаут
+    setTimeout(() => {
+      if (canvasRef.current) {
+        const ctx = canvasRef.current.getContext('2d');
+        ctx.fillStyle = '#222';
+        ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      }
+    }, 100);
+  }, []);
 
   // Старт игры
   const startGame = () => {
@@ -709,7 +893,7 @@ const PlatformerGame = () => {
             </button>
           )}
           <button className="control-btn reset-btn" onClick={resetGame}>
-            🔄 Сброс
+            🔄 Сброс (R)
           </button>
         </div>
       </div>
