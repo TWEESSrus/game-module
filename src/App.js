@@ -67,6 +67,17 @@ const defaultNodes = [
       gameId: 'pong',
       score: 0 
     },
+  },
+  // ДОБАВИЛ НОВУЮ НОДУ ДЛЯ ПЛАТФОРМЕРА
+  {
+    id: '6',
+    type: 'gameNode',
+    position: { x: 100, y: 850 },
+    data: { 
+      label: 'Платформер', 
+      gameId: 'platformer',
+      score: 0 
+    },
   }
 ];
 
@@ -125,7 +136,7 @@ function App() {
     <div className="app">
       <div className="header">
         <h1>Игровой блок на платформе обучения</h1>
-        <p>Перетаскивайте игры • Сохраняйте связи • Позиции сохраняются автоматически</p>
+        <p>Перетаскивайте игры  •  Позиции сохраняются автоматически</p>
         
         <div className="header-controls">
           {!panelVisible && (
