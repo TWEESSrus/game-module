@@ -1,41 +1,48 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ReactFlow, {
+  ReactFlowProvider,
   Background,
   Controls,
   MiniMap,
-  ReactFlowProvider,
-  applyEdgeChanges,
   applyNodeChanges,
+  applyEdgeChanges,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import './App.css';
 
 import GameHubNode from './components/GameHubNode/GameHubNode';
 
-const nodeTypes = {
-  gameHubNode: GameHubNode,
-};
+const nodeTypes = { gameHubNode: GameHubNode };
 
 const defaultNodes = [
   {
-    id: 'game-hub-1',
+    id: 'hub-1',
     type: 'gameHubNode',
     position: { x: 120, y: 120 },
-    data: { label: '🎮 Игровой модуль' },
-    style: { width: 520, height: 560 },
+    data: {
+      label: '🎮 Игровой хаб',
+      desiredSize: { width: 560, height: 520 }, // меню
+    },
+    style: { width: 560, height: 520 },
   },
 ];
 
-export default function App() {
-  const [nodes, setNodes] = useState(defaultNodes);
-  const [edges, setEdges] = useState([]);
+const initialEdges = [];
 
-  // overlay state (развернутая игра)
-  const [overlay, setOverlay] = useState({
-    open: false,
-    gameId: 'snake',
-    gameTitle: '',
+const approxEq = (a, b, eps = 0.5) => Math.abs((a ?? 0) - (b ?? 0)) <= eps;
+
+export default function App() {
+  const [nodes, setNodes] = useState(() => {
+    const saved = localStorage.getItem('gameNodes');
+    return saved ? JSON.parse(saved) : defaultNodes;
   });
+  const [edges, setEdges] = useState(initialEdges);
+
+  const rafRef = useRef(null);
+
+  useEffect(() => {
+    localStorage.setItem('gameNodes', JSON.stringify(nodes));
+  }, [nodes]);
 
   const onNodesChange = useCallback(
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -47,34 +54,42 @@ export default function App() {
     []
   );
 
-  // слушаем запрос на открытие/закрытие overlay от GameHubNode
+  // ✅ Меняем размер ноды ТОЛЬКО по событию от GameHubNode (выбор игры/меню)
   useEffect(() => {
-    const openOverlay = (e) => {
-      const d = e?.detail || {};
-      setOverlay({
-        open: true,
-        gameId: d.gameId || 'snake',
-        gameTitle: d.gameTitle || '',
+    const handler = (e) => {
+      const { nodeId, width, height } = e.detail || {};
+      if (!nodeId || !width || !height) return;
+
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
+        setNodes((nds) =>
+          nds.map((n) => {
+            if (n.id !== nodeId) return n;
+
+            const curW = n.style?.width;
+            const curH = n.style?.height;
+
+            // если размер фактически тот же — не трогаем
+            if (approxEq(curW, width) && approxEq(curH, height)) {
+              const desired = n.data?.desiredSize;
+              if (desired?.width === width && desired?.height === height) return n;
+              return { ...n, data: { ...(n.data || {}), desiredSize: { width, height } } };
+            }
+
+            return {
+              ...n,
+              data: { ...(n.data || {}), desiredSize: { width, height } },
+              style: { ...(n.style || {}), width, height },
+            };
+          })
+        );
       });
     };
 
-    const closeOverlay = () => {
-      setOverlay((prev) => ({ ...prev, open: false }));
-    };
-
-    window.addEventListener('openGameOverlay', openOverlay);
-    window.addEventListener('closeGameOverlay', closeOverlay);
-
-    // ESC закрывает
-    const onKeyDown = (ev) => {
-      if (ev.key === 'Escape') closeOverlay();
-    };
-    window.addEventListener('keydown', onKeyDown);
-
+    window.addEventListener('resizeGameHubNode', handler);
     return () => {
-      window.removeEventListener('openGameOverlay', openOverlay);
-      window.removeEventListener('closeGameOverlay', closeOverlay);
-      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('resizeGameHubNode', handler);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, []);
 
@@ -87,42 +102,13 @@ export default function App() {
           nodeTypes={nodeTypes}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
-          nodeDragHandle=".drag-handle"
           fitView
+          nodeDragHandle=".gamehub-drag-handle"
         >
           <Background variant="dots" gap={12} size={1} />
-          <MiniMap />
           <Controls />
+          <MiniMap />
         </ReactFlow>
-
-        {overlay.open && (
-          <div className="game-overlay nodrag">
-            <div className="game-overlay-header drag-handle" style={{ cursor: 'default' }}>
-              <div className="game-overlay-title">
-                {overlay.gameTitle ? overlay.gameTitle : '🎮 Игра'}
-              </div>
-              <button
-                className="game-overlay-close nodrag"
-                onClick={() => window.dispatchEvent(new CustomEvent('closeGameOverlay'))}
-                title="Закрыть (Esc)"
-              >
-                ✖
-              </button>
-            </div>
-
-            <div className="game-overlay-body nodrag">
-              {/* GameHubNode сам отрендерит нужную игру в режиме overlay */}
-              <GameHubNode
-                id="overlay"
-                data={{ label: 'overlay' }}
-                selected={false}
-                // спец-флаг, чтобы нода не работала как нода, а как контейнер игры
-                overlayMode
-                overlayGameId={overlay.gameId}
-              />
-            </div>
-          </div>
-        )}
       </ReactFlowProvider>
     </div>
   );
