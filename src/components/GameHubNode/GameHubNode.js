@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import React, { memo, useMemo, useState, useEffect } from 'react';
 import { Handle, Position } from 'reactflow';
 
 import SnakeGame from '../../games/Snake/SnakeGame';
@@ -8,15 +8,15 @@ import ClickerGame from '../../games/Clicker/ClickerGame';
 import Pong from '../../games/Pong/Pong';
 import PlatformerGame from '../../games/Platformer/PlatformerGame';
 
-const GameHubNode = memo(({ id, data, selected }) => {
+const GameHubNode = memo(({ id, data, selected, overlayMode = false, overlayGameId }) => {
   const games = useMemo(
     () => [
-      { id: 'snake', title: '🐍 Змейка', size: { width: 430, height: 520 }, component: <SnakeGame /> },
-      { id: '2048', title: '🔢 2048', size: { width: 430, height: 600 }, component: <Game2048 /> },
-      { id: 'memory', title: '🧠 Память', size: { width: 430, height: 540 }, component: <MemoryGame /> },
-      { id: 'clicker', title: '🖱️ Кликер', size: { width: 560, height: 640 }, component: <ClickerGame /> },
-      { id: 'pong', title: '🏓 Пинг-Понг', size: { width: 650, height: 520 }, component: <Pong /> },
-      { id: 'platformer', title: '👾 Платформер', size: { width: 720, height: 560 }, component: <PlatformerGame /> },
+      { id: 'snake', title: '🐍 Змейка', component: <SnakeGame /> },
+      { id: '2048', title: '🔢 2048', component: <Game2048 /> },
+      { id: 'memory', title: '🧠 Память', component: <MemoryGame /> },
+      { id: 'clicker', title: '🖱️ Кликер', component: <ClickerGame /> },
+      { id: 'pong', title: '🏓 Пинг-Понг', component: <Pong /> },
+      { id: 'platformer', title: '👾 Платформер', component: <PlatformerGame /> },
     ],
     []
   );
@@ -24,12 +24,16 @@ const GameHubNode = memo(({ id, data, selected }) => {
   const [currentGame, setCurrentGame] = useState(games[0].id);
   const [currentScore, setCurrentScore] = useState(0);
 
-  // режим развернутой ноды
-  const [expanded, setExpanded] = useState(false);
+  // если это overlay — игра задаётся извне
+  useEffect(() => {
+    if (overlayMode && overlayGameId) {
+      setCurrentGame(overlayGameId);
+      setCurrentScore(0);
+    }
+  }, [overlayMode, overlayGameId]);
 
   const active = useMemo(() => games.find((g) => g.id === currentGame), [games, currentGame]);
 
-  // слушаем очки от игр
   useEffect(() => {
     const handleScoreUpdate = (e) => {
       const d = e?.detail;
@@ -40,24 +44,22 @@ const GameHubNode = memo(({ id, data, selected }) => {
     return () => window.removeEventListener('gameScoreUpdate', handleScoreUpdate);
   }, [currentGame]);
 
-  // вычисляем размер ноды:
-  // - если expanded=true → большой размер
-  // - иначе → размер под конкретную игру
-  const getNodeSize = () => {
-    if (expanded) return { width: 980, height: 720 };
-    return active?.size || { width: 520, height: 560 };
-  };
-
-  // просим App.js изменить размер ноды
-  useEffect(() => {
-    const size = getNodeSize();
+  const openOverlay = () => {
     window.dispatchEvent(
-      new CustomEvent('resizeGameNode', {
-        detail: { nodeId: id, size },
+      new CustomEvent('openGameOverlay', {
+        detail: { gameId: currentGame, gameTitle: active?.title || '' },
       })
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expanded, currentGame, id]);
+  };
+
+  // В overlay-режиме мы не показываем handles и не даём перетаскивать
+  if (overlayMode) {
+    return (
+      <div className="game-overlay-container nodrag">
+        <div className="game-overlay-game nodrag">{active?.component}</div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -75,7 +77,7 @@ const GameHubNode = memo(({ id, data, selected }) => {
     >
       <Handle type="target" position={Position.Top} />
 
-      {/* HEADER: drag handle */}
+      {/* HEADER (drag handle) */}
       <div
         className="drag-handle"
         style={{
@@ -83,7 +85,6 @@ const GameHubNode = memo(({ id, data, selected }) => {
           borderBottom: '1px solid #e1e5e9',
           cursor: 'grab',
           userSelect: 'none',
-          background: '#fff',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center' }}>
@@ -96,20 +97,20 @@ const GameHubNode = memo(({ id, data, selected }) => {
 
           <button
             className="nodrag"
-            onClick={() => setExpanded((v) => !v)}
+            onClick={openOverlay}
             style={{
               padding: '8px 10px',
               borderRadius: 8,
               border: '1px solid #e1e5e9',
-              background: expanded ? '#eef2ff' : '#f8f9fa',
+              background: '#eef2ff',
               cursor: 'pointer',
               fontSize: 12,
               fontWeight: 700,
               whiteSpace: 'nowrap',
             }}
-            title={expanded ? 'Свернуть ноду' : 'Развернуть ноду'}
+            title="Развернуть игру"
           >
-            {expanded ? '🔽 Свернуть' : '🔼 Развернуть'}
+            🔼 Развернуть
           </button>
         </div>
 
@@ -138,7 +139,7 @@ const GameHubNode = memo(({ id, data, selected }) => {
         </div>
       </div>
 
-      {/* GAME AREA: безопасно — если не помещается, появляется скролл */}
+      {/* GAME AREA: скролл, чтобы ничего не ломалось */}
       <div
         className="nodrag game-hub-content"
         style={{
@@ -148,14 +149,7 @@ const GameHubNode = memo(({ id, data, selected }) => {
           background: '#fff',
         }}
       >
-        <div
-          className="game-hub-inner"
-          style={{
-            padding: expanded ? 12 : 10,
-            minWidth: 0,
-            minHeight: 0,
-          }}
-        >
+        <div className="game-hub-inner nodrag" style={{ padding: 10 }}>
           {active?.component}
         </div>
       </div>
