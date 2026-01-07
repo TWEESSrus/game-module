@@ -480,3 +480,25 @@ html, body {
     padding: 10px 15px;
   }
 }
+
+/* React Flow */
+.nodrag {
+  cursor: default;
+}
+
+/* drag handle */
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* game hub layout */
+.game-hub-node,
+.game-hub-content,
+.game-hub-inner {
+  width: 100%;
+  height: 100%;
+}
+
+.game-hub-inner * {
+  box-sizing: border-box;
+}
