@@ -1,30 +1,18 @@
-/* SnakeGame.css - Исправленный дизайн с центрированием */
-
 .snake-game {
   width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: white;
-  color: #333;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
 }
 
 .game-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid #e1e5e9;
-  flex-shrink: 0;
-}
-
-.game-header h2 {
-  margin: 0;
-  font-size: 18px;
-  color: #333;
-  font-weight: 600;
+  justify-content: center;
+  margin-bottom: 10px;
 }
 
 .game-controls {
@@ -33,43 +21,106 @@
 }
 
 .control-btn {
-  padding: 6px 12px;
   border: none;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
+  border-radius: 10px;
+  padding: 10px 14px;
   cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-weight: 600;
+  font-size: 13px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.control-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
 }
 
 .start-btn {
-  background: linear-gradient(45deg, #00b09b, #96c93d);
+  background: linear-gradient(135deg, #00b09b, #96c93d);
   color: white;
 }
 
 .pause-btn {
-  background: linear-gradient(45deg, #ff9966, #ff5e62);
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
 }
 
+/* difficulty */
+.difficulty-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.difficulty-label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 600;
+}
+
+.difficulty-btn {
+  border: 1px solid #e1e5e9;
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  color: #333;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.difficulty-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 12px rgba(0,0,0,0.10);
+}
+
+.difficulty-btn.active {
+  border-color: transparent;
+}
+
+/* info */
+.difficulty-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid #e1e5e9;
+  background: white;
+  margin-bottom: 10px;
+}
+
+.info-item {
+  text-align: center;
+  font-size: 11px;
+}
+
+.info-item span {
+  display: block;
+  color: #666;
+  margin-bottom: 2px;
+}
+
+.info-item strong {
+  color: #667eea;
+  font-weight: 600;
+}
+
+/* stats */
 .game-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  padding: 12px 16px;
-  border-bottom: 1px solid #e1e5e9;
-  flex-shrink: 0;
+  gap: 10px;
+  margin: 12px 0;
 }
 
 .stat-box {
   background: #f8f9fa;
-  border-radius: 8px;
-  padding: 8px;
+  padding: 10px;
+  border-radius: 10px;
   text-align: center;
   border: 1px solid #e1e5e9;
 }
@@ -78,86 +129,66 @@
   font-size: 10px;
   color: #666;
   margin-bottom: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-weight: 600;
 }
 
 .stat-value {
   font-size: 16px;
   font-weight: 700;
-  color: #667eea;
+  color: #333;
 }
 
-/* ИСПРАВЛЕННЫЙ КОНТЕЙНЕР - теперь всё по центру */
+/* board container */
 .game-board-container {
-  flex: 1;
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 10px;
-  min-height: 0;
+  align-items: center;
+  min-height: 420px;
   position: relative;
-  overflow: hidden;
 }
 
 .start-screen {
-  width: 100%;
-  max-width: 320px;
-  background: white;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #e1e5e9;
   border-radius: 12px;
-  padding: 20px;
-  text-align: center;
+  padding: 16px;
+  max-width: 380px;
+  width: 100%;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.08);
 }
 
 .instructions h3 {
-  color: #667eea;
-  margin-bottom: 12px;
-  font-size: 16px;
-  font-weight: 600;
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: #333;
 }
 
 .instructions ul {
-  list-style: none;
-  padding: 0;
-  margin-bottom: 20px;
-  text-align: left;
+  margin: 0;
+  padding-left: 18px;
+  color: #555;
+  font-size: 12px;
 }
 
 .instructions li {
-  padding: 6px 0;
-  font-size: 12px;
-  color: #666;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  margin-bottom: 6px;
 }
 
 .start-instruction-btn {
+  margin-top: 12px;
   width: 100%;
   padding: 10px;
-  background: linear-gradient(45deg, #667eea, #764ba2);
-  color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #00b09b, #96c93d);
+  color: white;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.start-instruction-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
 }
 
 .paused-screen {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: rgba(255, 255, 255, 0.95);
   display: flex;
   flex-direction: column;
@@ -178,26 +209,23 @@
   font-size: 12px;
 }
 
-/* ИСПРАВЛЕННОЕ ИГРОВОЕ ПОЛЕ - теперь точно по центру */
+/* ✅ ОДНО игровое поле (CSS Grid) */
 .game-board {
-  display: block;
+  display: grid;
   border: 2px solid #e1e5e9;
   border-radius: 6px;
   background: white;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   position: relative;
-  margin: 0 auto; /* Центрирование */
-}
-
-.grid-row {
-  display: flex;
+  margin: 0 auto;
+  max-width: 400px;
+  max-height: 400px;
 }
 
 .grid-cell {
-  width: 20px;
-  height: 20px;
   border: 1px solid #f0f0f0;
   position: relative;
+  box-sizing: border-box;
 }
 
 .grid-cell.snake-head {
@@ -221,12 +249,10 @@
   50% { transform: scale(1.1); opacity: 0.9; }
 }
 
+/* game over */
 .game-over-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: rgba(255, 255, 255, 0.98);
   display: flex;
   align-items: center;
@@ -263,119 +289,89 @@
 .final-stats p {
   margin: 6px 0;
   font-size: 12px;
-  color: #666;
-  display: flex;
-  justify-content: space-between;
-}
-
-.final-stats strong {
-  color: #667eea;
-  font-size: 14px;
+  color: #555;
 }
 
 .play-again-btn {
-  background: linear-gradient(45deg, #667eea, #764ba2);
-  color: white;
+  width: 100%;
+  padding: 10px;
   border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0 auto;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
-.play-again-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
-}
-
+/* mobile controls + footer */
 .mobile-controls {
-  display: none;
+  margin-top: 10px;
+  display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px;
-  gap: 4px;
-  flex-shrink: 0;
-  border-top: 1px solid #e1e5e9;
+  gap: 8px;
 }
 
 .horizontal-controls {
   display: flex;
-  gap: 30px;
   align-items: center;
-}
-
-.mobile-btn {
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 8px;
-  background: #667eea;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.mobile-btn:active {
-  transform: scale(0.95);
-  background: #764ba2;
+  gap: 10px;
 }
 
 .center-space {
   width: 40px;
 }
 
+.mobile-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid #e1e5e9;
+  background: #f8f9fa;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .game-instructions {
-  padding: 12px 16px;
+  margin-top: 12px;
   border-top: 1px solid #e1e5e9;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  flex-shrink: 0;
-  font-size: 11px;
-  color: #666;
+  padding-top: 10px;
 }
 
-.game-instructions p {
-  margin: 2px 0;
-}
-
-.game-instructions strong {
-  color: #333;
+.key-instructions p {
+  margin: 4px 0;
+  font-size: 12px;
+  color: #555;
+  text-align: center;
 }
 
 .legend {
+  margin-top: 10px;
   display: flex;
-  gap: 12px;
-  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
   gap: 6px;
+  font-size: 11px;
+  color: #555;
 }
 
 .legend-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid #e1e5e9;
 }
 
 .legend-color.snake-head {
   background: linear-gradient(45deg, #00b09b, #96c93d);
+  border-radius: 50%;
 }
 
 .legend-color.snake-body {
@@ -384,133 +380,19 @@
 
 .legend-color.food {
   background: linear-gradient(45deg, #ff5e62, #ff9966);
+  border-radius: 50%;
 }
 
+/* responsive */
 @media (max-width: 768px) {
   .game-stats {
     grid-template-columns: repeat(2, 1fr);
   }
-  
-  .mobile-controls {
-    display: flex;
-  }
-  
-  .game-instructions {
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .legend {
-    justify-content: center;
-  }
-  
-  .grid-cell {
-    width: 18px;
-    height: 18px;
-  }
-}
 
-@media (max-width: 480px) {
-  .grid-cell {
-    width: 16px;
-    height: 16px;
-  }
-}
-/* Стили для выбора сложности */
-.difficulty-selector {
-  padding: 8px 16px;
-  border-bottom: 1px solid #e1e5e9;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-  background: #f8f9fa;
-}
-
-.difficulty-label {
-  font-size: 11px;
-  color: #666;
-  font-weight: 600;
-}
-
-.difficulty-btn {
-  padding: 6px 12px;
-  background: #f8f9fa;
-  border: 1px solid #e1e5e9;
-  border-radius: 6px;
-  font-size: 10px;
-  color: #666;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.difficulty-btn.active {
-  color: white;
-  border-color: transparent;
-}
-
-.difficulty-btn:hover:not(.active) {
-  background: #e1e5e9;
-}
-
-.difficulty-info {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  padding: 8px 16px;
-  border-bottom: 1px solid #e1e5e9;
-  background: white;
-  flex-shrink: 0;
-}
-
-.info-item {
-  text-align: center;
-  font-size: 11px;
-}
-
-.info-item span {
-  display: block;
-  color: #666;
-  margin-bottom: 2px;
-}
-
-.info-item strong {
-  color: #667eea;
-  font-weight: 600;
-}
-
-/* Исправленное игровое поле с CSS Grid */
-.game-board {
-  display: grid;
-  border: 2px solid #e1e5e9;
-  border-radius: 6px;
-  background: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-  position: relative;
-  margin: 0 auto;
-  max-width: 400px;
-  max-height: 400px;
-}
-
-.grid-cell {
-  border: 1px solid #f0f0f0;
-  position: relative;
-  box-sizing: border-box;
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-  .difficulty-selector {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  
   .difficulty-info {
     grid-template-columns: repeat(3, 1fr);
   }
-  
+
   .game-board {
     max-width: 350px;
     max-height: 350px;
@@ -522,13 +404,9 @@
     max-width: 300px;
     max-height: 300px;
   }
-  
+
   .difficulty-btn {
     padding: 4px 8px;
-    font-size: 9px;
-  }
-  
-  .info-item {
     font-size: 10px;
   }
 }
