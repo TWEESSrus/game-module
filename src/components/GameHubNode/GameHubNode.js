@@ -106,6 +106,13 @@ async function upsertNickname({ userId, nickname }) {
   return res.json();
 }
 
+// GET /api/users/:userId -> { user_id, nickname, updated_at } | null
+async function fetchNickname(userId) {
+  const res = await fetch(`${STATS_API_BASE}/api/users/${encodeURIComponent(userId)}`);
+  if (!res.ok) throw new Error(`GET /api/users/:userId failed: ${res.status}`);
+  return res.json();
+}
+
 const GameHubNode = memo(({ id, data, selected, overlayMode = false, overlayGameId }) => {
   const games = useMemo(
     () => [
@@ -171,9 +178,11 @@ const GameHubNode = memo(({ id, data, selected, overlayMode = false, overlayGame
   // ✅ говорим App: “поставь такой размер ноды” (в пикселях экрана)
   useEffect(() => {
     const size =
-      overlayMode ? GAME_NODE_SIZES[currentGame] :
-      view === 'menu' ? MENU_SIZE :
-      (GAME_NODE_SIZES[currentGame] || MENU_SIZE);
+      overlayMode
+        ? GAME_NODE_SIZES[currentGame]
+        : view === 'menu'
+          ? MENU_SIZE
+          : (GAME_NODE_SIZES[currentGame] || MENU_SIZE);
 
     window.dispatchEvent(
       new CustomEvent('resizeGameHubNode', {
@@ -289,7 +298,23 @@ const GameHubNode = memo(({ id, data, selected, overlayMode = false, overlayGame
     if (overlayMode) return;
     if (view !== 'menu') return;
     if (menuTab !== 'stats') return;
+
+    // грузим топ
     loadLeaderboard(lbGame);
+
+    // и пробуем подтянуть текущий ник в поле
+    const { userId } = getAuthFromStorage();
+    if (!userId) return;
+
+    fetchNickname(userId)
+      .then((u) => {
+        if (u?.nickname) setNicknameInput(u.nickname);
+      })
+      .catch((e) => {
+        // если endpoint ещё не добавили — не мешаем работе
+        console.warn(e);
+      });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuTab, lbGame, view, overlayMode]);
   // ===================================================================
@@ -311,6 +336,7 @@ const GameHubNode = memo(({ id, data, selected, overlayMode = false, overlayGame
       setNickMsg('');
       setNickSaving(true);
       await upsertNickname({ userId, nickname: nick });
+      setNicknameInput(nick); // ✅ фиксируем в поле
       setNickMsg('✅ Ник сохранён');
       await loadLeaderboard(lbGame);
     } catch (e) {
