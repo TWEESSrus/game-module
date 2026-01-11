@@ -2,25 +2,17 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './SnakeGame.css';
 
 const SnakeGame = () => {
-  // ✅ одна сетка всегда
   const GRID_SIZE = 20;
-
-  // ✅ сложность = только скорость
-  const SPEEDS = {
-    easy: 200,
-    medium: 150,
-    hard: 100
-  };
-
+  const SCORE_PER_FOOD = 10;
+  
   const [difficulty, setDifficulty] = useState('medium');
-  const [snake, setSnake] = useState([]);
+  const [snake, setSnake] = useState([{ x: 10, y: 10 }]);
   const [food, setFood] = useState({ x: 5, y: 5 });
   const [direction, setDirection] = useState('RIGHT');
   const [nextDirection, setNextDirection] = useState('RIGHT');
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
-  const [speed, setSpeed] = useState(SPEEDS.medium);
   const [highScore, setHighScore] = useState(0);
   const [gamePaused, setGamePaused] = useState(false);
 
@@ -29,46 +21,95 @@ const SnakeGame = () => {
     if (savedHighScore) {
       setHighScore(parseInt(savedHighScore));
     }
-    initializeGame();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ✅ КАЧЕСТВЕННО: еду генерируем на основе "переданной" змейки (актуальной),
-  // а не по устаревшему state snake — это убирает странные баги с едой.
-  const generateFood = useCallback((snakeBody) => {
-    const emptyCells = [];
+  useEffect(() => {
+    if (!gameStarted || gameOver || gamePaused) return;
 
+    const speeds = { easy: 200, medium: 150, hard: 100 };
+    const speed = speeds[difficulty];
+
+    const gameLoop = setInterval(() => {
+      setSnake(prevSnake => {
+        const head = { ...prevSnake[0] };
+        const currentDirection = nextDirection;
+        
+        switch (currentDirection) {
+          case 'RIGHT': head.x += 1; break;
+          case 'LEFT': head.x -= 1; break;
+          case 'UP': head.y -= 1; break;
+          case 'DOWN': head.y += 1; break;
+          default: break;
+        }
+
+        if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE) {
+          handleGameOver();
+          return prevSnake;
+        }
+
+        for (let i = 1; i < prevSnake.length; i++) {
+          if (head.x === prevSnake[i].x && head.y === prevSnake[i].y) {
+            handleGameOver();
+            return prevSnake;
+          }
+        }
+
+        const newSnake = [head, ...prevSnake];
+
+        if (head.x === food.x && head.y === food.y) {
+          setScore(prev => {
+            const newScore = prev + SCORE_PER_FOOD;
+            if (newScore > highScore) {
+              setHighScore(newScore);
+              localStorage.setItem('snakeHighScore', newScore.toString());
+            }
+            return newScore;
+          });
+          
+          const newFood = generateFood(prevSnake);
+          setFood(newFood);
+        } else {
+          newSnake.pop();
+        }
+
+        return newSnake;
+      });
+    }, speed);
+
+    return () => clearInterval(gameLoop);
+  }, [gameStarted, gameOver, gamePaused, difficulty, nextDirection, food, highScore]);
+
+  const generateFood = useCallback((currentSnake) => {
+    const emptyCells = [];
+    
     for (let y = 0; y < GRID_SIZE; y++) {
       for (let x = 0; x < GRID_SIZE; x++) {
-        if (!snakeBody.some(segment => segment.x === x && segment.y === y)) {
+        if (!currentSnake.some(segment => segment.x === x && segment.y === y)) {
           emptyCells.push({ x, y });
         }
       }
     }
-
+    
     if (emptyCells.length > 0) {
-      return emptyCells[Math.floor(Math.random() * emptyCells.length)];
+      const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+      return randomCell;
     }
-
-    return { x: -1, y: -1 };
-  }, [GRID_SIZE]);
+    
+    return { x: 0, y: 0 };
+  }, []);
 
   const initializeGame = () => {
-    const size = GRID_SIZE;
-    const initialSpeed = SPEEDS[difficulty];
-    const midPoint = Math.floor(size / 2);
-
+    const midPoint = Math.floor(GRID_SIZE / 2);
     const initialSnake = [{ x: midPoint, y: midPoint }];
-    let initialFood = {
-      x: Math.floor(Math.random() * size),
-      y: Math.floor(Math.random() * size)
-    };
-
-    // не даём еде появиться на голове
-    if (initialSnake.some(segment => segment.x === initialFood.x && segment.y === initialFood.y)) {
-      initialFood = generateFood(initialSnake);
-    }
-
+    
+    let initialFood;
+    do {
+      initialFood = { 
+        x: Math.floor(Math.random() * GRID_SIZE),
+        y: Math.floor(Math.random() * GRID_SIZE)
+      };
+    } while (initialSnake.some(segment => segment.x === initialFood.x && segment.y === initialFood.y));
+    
     setSnake(initialSnake);
     setFood(initialFood);
     setDirection('RIGHT');
@@ -77,148 +118,72 @@ const SnakeGame = () => {
     setGameOver(false);
     setGameStarted(true);
     setGamePaused(false);
-    setSpeed(initialSpeed);
+  };
+
+  const handleGameOver = () => {
+    setGameOver(true);
+    if (score > highScore) {
+      setHighScore(score);
+      localStorage.setItem('snakeHighScore', score.toString());
+    }
   };
 
   const changeDifficulty = (newDifficulty) => {
     if (gameStarted && !gameOver) {
-      if (window.confirm('Сменить сложность? Текущая игра будет сброшена.')) {
+      if (window.confirm('Сменить скорость? Текущая игра будет сброшена.')) {
         setDifficulty(newDifficulty);
-        // скорость поменяется после setDifficulty, поэтому делаем небольшой таймаут как у тебя
-        setTimeout(() => initializeGame(), 100);
+        initializeGame();
       }
     } else {
       setDifficulty(newDifficulty);
-      // если игра не идёт — просто обновляем скорость сразу
-      setSpeed(SPEEDS[newDifficulty]);
     }
   };
 
-  const checkCollision = useCallback((head, body) => {
-    if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE) {
-      return true;
-    }
-
-    // столкновение с телом
-    for (let i = 1; i < body.length; i++) {
-      if (head.x === body[i].x && head.y === body[i].y) {
-        return true;
-      }
-    }
-
-    return false;
-  }, [GRID_SIZE]);
-
-  const moveSnake = useCallback(() => {
-    if (!gameStarted || gameOver || gamePaused) return;
-
-    setSnake(prevSnake => {
-      const head = { ...prevSnake[0] };
-
-      // применяем отложенное направление
-      const currentDirection = nextDirection;
-      setDirection(currentDirection);
-
-      switch (currentDirection) {
-        case 'RIGHT': head.x += 1; break;
-        case 'LEFT': head.x -= 1; break;
-        case 'UP': head.y -= 1; break;
-        case 'DOWN': head.y += 1; break;
-        default: break;
-      }
-
-      if (checkCollision(head, prevSnake)) {
-        setGameOver(true);
-        // highScore обновим ниже по score в state (как у тебя было)
-        return prevSnake;
-      }
-
-      const newSnake = [head, ...prevSnake];
-
-      if (head.x === food.x && head.y === food.y) {
-        // ✅ очки всегда +10, бонуса нет
-        setScore(prev => {
-          const newScore = prev + 10;
-
-          // ✅ безопасно обновляем рекорд
-          setHighScore(prevHigh => {
-            if (newScore > prevHigh) {
-              localStorage.setItem('snakeHighScore', newScore.toString());
-              return newScore;
-            }
-            return prevHigh;
-          });
-
-          return newScore;
-        });
-
-        // ✅ еду генерируем от "новой" змейки (с ростом)
-        const newFood = generateFood(newSnake);
-        if (newFood.x !== -1 && newFood.y !== -1) {
-          setFood(newFood);
-        } else {
-          setGameOver(true);
-        }
-      } else {
-        newSnake.pop();
-      }
-
-      return newSnake;
-    });
-  }, [gameStarted, gameOver, gamePaused, nextDirection, checkCollision, food, generateFood]);
-
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (gameOver) return;
-
-      const key = e.key;
-
-      // WASD + стрелки
-      const isUp = key === 'ArrowUp' || key === 'w' || key === 'W';
-      const isDown = key === 'ArrowDown' || key === 's' || key === 'S';
-      const isLeft = key === 'ArrowLeft' || key === 'a' || key === 'A';
-      const isRight = key === 'ArrowRight' || key === 'd' || key === 'D';
-
-      if (isUp) {
-        if (direction !== 'DOWN') {
-          e.preventDefault();
-          setNextDirection('UP');
-        }
+      if (gameOver || !gameStarted) return;
+      
+      const key = e.key.toLowerCase();
+      
+      if (key === ' ') {
+        e.preventDefault();
+        setGamePaused(prev => !prev);
         return;
       }
-      if (isDown) {
-        if (direction !== 'UP') {
-          e.preventDefault();
-          setNextDirection('DOWN');
-        }
-        return;
-      }
-      if (isLeft) {
-        if (direction !== 'RIGHT') {
-          e.preventDefault();
-          setNextDirection('LEFT');
-        }
-        return;
-      }
-      if (isRight) {
-        if (direction !== 'LEFT') {
-          e.preventDefault();
-          setNextDirection('RIGHT');
-        }
-        return;
-      }
-
-      switch (key) {
-        case ' ':
-          e.preventDefault();
-          if (gameStarted && !gameOver) {
-            setGamePaused(prev => !prev);
+      
+      if (gamePaused) return;
+      
+      switch(key) {
+        case 'arrowup':
+        case 'w':
+          if (direction !== 'DOWN') {
+            e.preventDefault();
+            setNextDirection('UP');
+            setDirection('UP');
           }
           break;
-        case 'Enter':
-          if (!gameStarted || gameOver) {
+        case 'arrowdown':
+        case 's':
+          if (direction !== 'UP') {
             e.preventDefault();
-            initializeGame();
+            setNextDirection('DOWN');
+            setDirection('DOWN');
+          }
+          break;
+        case 'arrowleft':
+        case 'a':
+          if (direction !== 'RIGHT') {
+            e.preventDefault();
+            setNextDirection('LEFT');
+            setDirection('LEFT');
+          }
+          break;
+        case 'arrowright':
+        case 'd':
+          if (direction !== 'LEFT') {
+            e.preventDefault();
+            setNextDirection('RIGHT');
+            setDirection('RIGHT');
           }
           break;
         default:
@@ -228,27 +193,11 @@ const SnakeGame = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [direction, gameStarted, gameOver]);
-
-  useEffect(() => {
-    if (!gameStarted || gameOver || gamePaused) return;
-
-    const gameInterval = setInterval(moveSnake, speed);
-    return () => clearInterval(gameInterval);
-  }, [gameStarted, gameOver, gamePaused, moveSnake, speed]);
-
-  useEffect(() => {
-    if (gameStarted) {
-      const event = new CustomEvent('gameScoreUpdate', {
-        detail: { game: 'snake', score }
-      });
-      window.dispatchEvent(event);
-    }
-  }, [score, gameStarted]);
+  }, [direction, gameStarted, gameOver, gamePaused]);
 
   const handleButtonControl = (newDirection) => {
     if (gamePaused || gameOver || !gameStarted) return;
-
+    
     if (
       (newDirection === 'UP' && direction !== 'DOWN') ||
       (newDirection === 'DOWN' && direction !== 'UP') ||
@@ -256,40 +205,40 @@ const SnakeGame = () => {
       (newDirection === 'RIGHT' && direction !== 'LEFT')
     ) {
       setNextDirection(newDirection);
+      setDirection(newDirection);
     }
   };
 
-  const getDifficultyColor = (diff) => {
-    return diff === difficulty ?
-      diff === 'easy' ? '#00b09b' :
-      diff === 'medium' ? '#667eea' : '#ff5e62'
-      : '#666';
+  const getDifficultyName = (diff) => {
+    switch(diff) {
+      case 'easy': return 'Медленно';
+      case 'medium': return 'Нормально';
+      case 'hard': return 'Быстро';
+      default: return '';
+    }
   };
 
-  // если игра окончена — убедимся, что рекорд не потеряли (на случай если умерли между тиками)
-  useEffect(() => {
-    if (gameOver) {
-      setHighScore(prevHigh => {
-        if (score > prevHigh) {
-          localStorage.setItem('snakeHighScore', score.toString());
-          return score;
-        }
-        return prevHigh;
-      });
+  const getDifficultySpeed = (diff) => {
+    switch(diff) {
+      case 'easy': return '200 мс';
+      case 'medium': return '150 мс';
+      case 'hard': return '100 мс';
+      default: return '';
     }
-  }, [gameOver, score]);
+  };
 
   return (
     <div className="snake-game">
-      <div className="game-header">
-        <div className="game-controls">
+      <div className="snake-game-header">
+        <h2>🐍 Змейка</h2>
+        <div className="snake-game-controls">
           {!gameStarted || gameOver ? (
-            <button className="control-btn start-btn" onClick={initializeGame}>
-              {gameOver ? '🔄 Играть снова' : '▶️ Начать игру'}
+            <button className="snake-control-btn snake-start-btn" onClick={initializeGame}>
+              {gameOver ? '🔄 Заново' : '▶️ Старт'}
             </button>
           ) : (
-            <button
-              className="control-btn pause-btn"
+            <button 
+              className="snake-control-btn snake-pause-btn" 
               onClick={() => setGamePaused(!gamePaused)}
             >
               {gamePaused ? '▶️ Продолжить' : '⏸️ Пауза'}
@@ -298,90 +247,75 @@ const SnakeGame = () => {
         </div>
       </div>
 
-      <div className="difficulty-selector">
-        <div className="difficulty-label">Сложность:</div>
-        {['easy', 'medium', 'hard'].map(diff => (
-          <button
-            key={diff}
-            className={`difficulty-btn ${difficulty === diff ? 'active' : ''}`}
-            onClick={() => changeDifficulty(diff)}
-            style={{
-              background: difficulty === diff ? getDifficultyColor(diff) : undefined,
-              color: difficulty === diff ? 'white' : undefined
-            }}
-          >
-            {diff === 'easy' && '🐢 Легкая'}
-            {diff === 'medium' && '⚡ Средняя'}
-            {diff === 'hard' && '🔥 Сложная'}
-          </button>
-        ))}
-      </div>
-
-      {/* ✅ убрали бонус, сетка одна */}
-      <div className="difficulty-info">
-        <div className="info-item">
-          <span>Поле:</span>
-          <strong>{GRID_SIZE}x{GRID_SIZE}</strong>
+      <div className="snake-difficulty-selector">
+        <div className="snake-difficulty-header">
+          <div className="snake-difficulty-label">Скорость:</div>
+          <div className="snake-current-speed">{getDifficultySpeed(difficulty)}</div>
         </div>
-        <div className="info-item">
-          <span>Скорость:</span>
-          <strong>{speed}ms</strong>
-        </div>
-        <div className="info-item">
-          <span>Очки:</span>
-          <strong>+10/еда</strong>
+        <div className="snake-difficulty-buttons">
+          {['easy', 'medium', 'hard'].map(diff => (
+            <button
+              key={diff}
+              className={`snake-difficulty-btn ${difficulty === diff ? 'snake-active' : ''}`}
+              onClick={() => changeDifficulty(diff)}
+            >
+              {getDifficultyName(diff)}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="game-stats">
-        <div className="stat-box">
-          <div className="stat-label">Счет</div>
-          <div className="stat-value">{score}</div>
+      <div className="snake-game-stats">
+        <div className="snake-stat-box">
+          <div className="snake-stat-label">Счет</div>
+          <div className="snake-stat-value">{score}</div>
         </div>
-        <div className="stat-box">
-          <div className="stat-label">Рекорд</div>
-          <div className="stat-value">{highScore}</div>
+        <div className="snake-stat-box">
+          <div className="snake-stat-label">Рекорд</div>
+          <div className="snake-stat-value">{highScore}</div>
         </div>
-        <div className="stat-box">
-          <div className="stat-label">Длина</div>
-          <div className="stat-value">{snake.length}</div>
+        <div className="snake-stat-box">
+          <div className="snake-stat-label">Длина</div>
+          <div className="snake-stat-value">{snake.length}</div>
         </div>
-        <div className="stat-box">
-          <div className="stat-label">Сложность</div>
-          <div className="stat-value">
+        <div className="snake-stat-box">
+          <div className="snake-stat-label">Сложность</div>
+          <div className="snake-stat-value">
             {difficulty === 'easy' ? '🐢' : difficulty === 'medium' ? '⚡' : '🔥'}
           </div>
         </div>
       </div>
 
-      <div className="game-board-container">
+      <div className="snake-game-board-container">
         {!gameStarted ? (
-          <div className="start-screen">
-            <div className="instructions">
+          <div className="snake-start-screen">
+            <div className="snake-instructions">
               <h3>Как играть:</h3>
               <ul>
-                <li>📍 Используйте стрелки или WASD</li>
-                <li>🍎 Собирайте красные яблоки</li>
-                <li>🚫 Избегайте стен и себя</li>
-                <li>🎯 Выберите сложность выше</li>
+                <li>🎮 Управление: ←↑↓→ </li>
+                <li>🍎 Съедайте красные яблоки</li>
+                <li>⚠️ Не врезайтесь в стены и себя</li>
+                <li>⏸️ Пауза: Пробел</li>
                 <li>🏆 Побивайте свой рекорд!</li>
               </ul>
-              <button className="start-instruction-btn" onClick={initializeGame}>
+              <button className="snake-start-instruction-btn" onClick={initializeGame}>
                 НАЧАТЬ ИГРУ
               </button>
             </div>
           </div>
         ) : gamePaused ? (
-          <div className="paused-screen">
-            <h3>⏸️ ИГРА НА ПАУЗЕ</h3>
-            <p>Нажмите пробел или кнопку "Продолжить"</p>
+          <div className="snake-paused-screen">
+            <h3>⏸️ ПАУЗА</h3>
+            <p>Нажмите пробел для продолжения</p>
           </div>
         ) : (
-          <div
-            className="game-board"
-            style={{
+          <div 
+            className="snake-game-board"
+            style={{ 
               gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)`,
-              gridTemplateRows: `repeat(${GRID_SIZE}, 1fr)`
+              gridTemplateRows: `repeat(${GRID_SIZE}, 1fr)`,
+              width: `${GRID_SIZE * 20}px`,
+              height: `${GRID_SIZE * 20}px`
             }}
           >
             {Array.from({ length: GRID_SIZE * GRID_SIZE }).map((_, index) => {
@@ -390,39 +324,32 @@ const SnakeGame = () => {
               const isSnakeHead = snake[0]?.x === x && snake[0]?.y === y;
               const isSnakeBody = snake.slice(1).some(segment => segment.x === x && segment.y === y);
               const isFood = food.x === x && food.y === y;
-
-              let cellClass = 'grid-cell';
-              if (isSnakeHead) cellClass += ' snake-head';
-              else if (isSnakeBody) cellClass += ' snake-body';
-              else if (isFood) cellClass += ' food';
-
+              
+              let cellClass = 'snake-grid-cell';
+              if (isSnakeHead) cellClass += ' snake-grid-cell-head';
+              else if (isSnakeBody) cellClass += ' snake-grid-cell-body';
+              else if (isFood) cellClass += ' snake-grid-cell-food';
+              
               return (
                 <div
                   key={`${x}-${y}`}
                   className={cellClass}
-                  style={{
-                    width: `${400 / GRID_SIZE}px`,
-                    height: `${400 / GRID_SIZE}px`
-                  }}
                 />
               );
             })}
-
+            
             {gameOver && (
-              <div className="game-over-overlay">
-                <div className="game-over-content">
-                  <h3>💀 ИГРА ОКОНЧЕНА</h3>
-                  <div className="final-stats">
-                    <p>Ваш счет: <strong>{score}</strong></p>
+              <div className="snake-game-over-overlay">
+                <div className="snake-game-over-content">
+                  <h3>💀 КОНЕЦ ИГРЫ</h3>
+                  <div className="snake-final-stats">
+                    <p>Счет: <strong>{score}</strong></p>
                     <p>Рекорд: <strong>{Math.max(score, highScore)}</strong></p>
-                    <p>Длина змейки: <strong>{snake.length}</strong></p>
-                    <p>Сложность: <strong>
-                      {difficulty === 'easy' ? 'Легкая' :
-                        difficulty === 'medium' ? 'Средняя' : 'Сложная'}
-                    </strong></p>
+                    <p>Длина: <strong>{snake.length}</strong></p>
+                    <p>Сложность: <strong>{getDifficultyName(difficulty)}</strong></p>
                   </div>
-                  <button
-                    className="play-again-btn"
+                  <button 
+                    className="snake-play-again-btn"
                     onClick={initializeGame}
                   >
                     🎮 Играть снова
@@ -434,53 +361,53 @@ const SnakeGame = () => {
         )}
       </div>
 
-      <div className="mobile-controls">
-        <button
-          className="mobile-btn up-btn"
+      <div className="snake-mobile-controls">
+        <button 
+          className="snake-mobile-btn"
           onClick={() => handleButtonControl('UP')}
         >
           ↑
         </button>
-        <div className="horizontal-controls">
-          <button
-            className="mobile-btn left-btn"
+        <div className="snake-horizontal-controls">
+          <button 
+            className="snake-mobile-btn"
             onClick={() => handleButtonControl('LEFT')}
           >
             ←
           </button>
-          <div className="center-space"></div>
-          <button
-            className="mobile-btn right-btn"
+          <div className="snake-center-space"></div>
+          <button 
+            className="snake-mobile-btn"
             onClick={() => handleButtonControl('RIGHT')}
           >
             →
           </button>
         </div>
-        <button
-          className="mobile-btn down-btn"
+        <button 
+          className="snake-mobile-btn"
           onClick={() => handleButtonControl('DOWN')}
         >
           ↓
         </button>
       </div>
 
-      <div className="game-instructions">
-        <div className="key-instructions">
-          <p><strong>Управление:</strong> ←↑↓→ или WASD</p>
-          <p><strong>Пауза:</strong> Пробел • <strong>Рестарт:</strong> Enter</p>
+      <div className="snake-game-instructions">
+        <div className="snake-key-instructions">
+          <p><strong>Управление:</strong> ←↑↓→ </p>
+          <p><strong>Пауза:</strong> Пробел</p>
         </div>
-        <div className="legend">
-          <div className="legend-item">
-            <div className="legend-color snake-head"></div>
-            <span>Голова змейки</span>
+        <div className="snake-legend">
+          <div className="snake-legend-item">
+            <div className="snake-legend-color snake-legend-head"></div>
+            <span>Голова</span>
           </div>
-          <div className="legend-item">
-            <div className="legend-color snake-body"></div>
-            <span>Тело змейки</span>
+          <div className="snake-legend-item">
+            <div className="snake-legend-color snake-legend-body"></div>
+            <span>Тело</span>
           </div>
-          <div className="legend-item">
-            <div className="legend-color food"></div>
-            <span>Еда (+10 очков)</span>
+          <div className="snake-legend-item">
+            <div className="snake-legend-color snake-legend-food"></div>
+            <span>Яблоко (+10)</span>
           </div>
         </div>
       </div>

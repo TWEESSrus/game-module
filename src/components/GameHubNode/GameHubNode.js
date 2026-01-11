@@ -14,12 +14,12 @@ const MENU_SIZE = { width: 560, height: 520 };
 
 // Размеры ноды “под игру” (подбираем без скролла)
 const GAME_NODE_SIZES = {
-  snake: { width: 760, height: 1000 },
+  snake: { width: 700, height: 1000 },
   '2048': { width: 560, height: 780 },
-  memory: { width: 980, height: 820 },
+  memory: { width: 680, height: 890 },
   clicker: { width: 980, height: 760 },
   pong: { width: 760, height: 780 },
-  platformer: { width: 980, height: 720 },
+  platformer: { width: 980, height: 750 },
 };
 
 const GameHubNode = memo(({ id, data, selected, overlayMode = false, overlayGameId }) => {
